@@ -1,0 +1,21 @@
+flowchart TD
+A["SoundsofRangi Repository<br>Security Setup"] --> B["Enable GitHub Security Features<br>(Dependabot, Secret Scanning)"]
+A --> C["Apply Strong License<br>(AGPLv3 Recommended)"]
+A --> D["Implement Access Controls<br>(Branch Protection, Least Privilege)"]
+A --> E["Manage Secrets & Data<br>(Scan, Rotate, Use GitHub Secrets)"]
+A --> F["Harden Account Security<br>(Enforce 2FA, Review Sessions)"]
+
+B --> B1["Prevent Vulnerable Dependencies"]
+B --> B2["Block Secret Leaks"]
+
+C --> C1["Protect IP"]
+C --> C2["Define Usage Terms"]
+
+D --> D1["Require PR Reviews"]
+D --> D2["Enforce Checks Before Merge"]
+
+E --> E1["Audit History"]
+E --> E2["Rotate Exposed Keys"]
+
+F --> F1["Use WebAuthn 2FA"]
+F --> F2["Revoke Unknown Sessions"]
