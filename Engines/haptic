@@ -1,0 +1,18 @@
+# Haptic feedback interface for wearables (abstracted for now)
+class HapticEngine:
+    def __init__(self):
+        self.patterns = {
+            "cut": [100, 200, 100],  # ms vibrations
+            "hold": [500],
+            "shift": [200, 200, 200],
+            "balance": [300, 300],
+            "wait": [100, 1000],
+            "buy": [50, 50, 50, 50],
+            "override": [1000]
+        }
+
+    def vibrate(self, pattern_name: str):
+        pattern = self.patterns.get(pattern_name, [])
+        # This would integrate with wearable SDKs like Android Wear, iOS Core Haptics
+        print(f"[HAPTIC] Pattern '{pattern_name}': {pattern}")
+        # Actual implementation would use platform-specific APIs
