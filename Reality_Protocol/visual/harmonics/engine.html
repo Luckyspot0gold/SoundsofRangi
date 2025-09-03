@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Rangi Visual Harmonics Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ffd700, #ff6b35, #f7931e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #cccccc;
+        }
+
+        .visualization-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .viz-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .viz-panel h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        canvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.9em;
+            color: #cccccc;
+        }
+
+        input[type="range"] {
+            width: 120px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            border-radius: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #ffd700;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ffd700, #ff6b35);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .market-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .market-card h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .market-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .market-change {
+            font-size: 0.9em;
+        }
+
+        .positive { color: #00ff88; }
+        .negative { color: #ff4444; }
+
+        .frequency-display {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 15px 0;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .harmonic-series {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .harmonic-note {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 2px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .waveform-container {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        .wave-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 215, 0, 0.1) 50%, 
+                transparent 100%);
+            animation: wave-sweep 2s infinite;
+        }
+
+        @keyframes wave-sweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .resonance-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .resonance-bar {
+            width: 200px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .resonance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ffaa00, #00ff88);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .immutable-ledger {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ledger-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid #ffd700;
+        }
+
+        .status-indicators {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .status-indicator {
+            text-align: center;
+        }
+
+        .status-light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-active { background: #00ff88; }
+        .status-warning { background: #ffaa00; }
+        .status-error { background: #ff4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .color-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 ORION RANGI VISUAL HARMONICS ENGINE 🎵</h1>
+            <p>Real-Time Market Data → Harmonic Frequency Visualization</p>
+            <p>Patent Pending: US2025/STYRD | W.J. McCrea - Reality Protocol LLC</p>
+        </div>
+
+        <div class="market-data">
+            <div class="market-card">
+                <h4>Bitcoin (BTC)</h4>
+                <div class="market-value" id="btc-price">$45,234.56</div>
+                <div class="market-change positive" id="btc-change">+2.34%</div>
+            </div>
+            <div class="market-card">
+                <h4>Ethereum (ETH)</h4>
+                <div class="market-value" id="eth-price">$2,845.67</div>
+                <div class="market-change positive" id="eth-change">+1.89%</div>
+            </div>
+            <div class="market-card">
+                <h4>Solana (SOL)</h4>
+                <div class="market-value" id="sol-price">$98.45</div>
+                <div class="market-change negative" id="sol-change">-0.67%</div>
+            </div>
+            <div class="market-card">
+                <h4>432Hz Base</h4>
+                <div class="market-value" id="base-freq">432.00 Hz</div>
+                <div class="market-change" id="harmonic-quality">Quality: 94.2%</div>
+            </div>
+        </div>
+
+        <div class="visualization-grid">
+            <!-- Real-Time Waveform -->
+            <div class="viz-panel">
+                <h3>🌊 Real-Time Waveform</h3>
+                <div class="waveform-container">
+                    <canvas id="waveformCanvas"></canvas>
+                    <div class="wave-overlay"></div>
+                </div>
+                <div class="frequency-display" id="currentFreq">442.8 Hz</div>
+                <div class="color-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffd700;"></div>
+                        <span>Fundamental</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff6b35;"></div>
+                        <span>Harmonics</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frequency Spectrum -->
+            <div class="viz-panel">
+                <h3>📊 Frequency Spectrum</h3>
+                <canvas id="spectrumCanvas"></canvas>
+                <div class="harmonic-series" id="harmonicSeries">
+                    <div class="harmonic-note">432 Hz (F)</div>
+                    <div class="harmonic-note">864 Hz (F)</div>
+                    <div class="harmonic-note">648 Hz (C)</div>
+                    <div class="harmonic-note">1296 Hz (F)</div>
+                </div>
+            </div>
+
+            <!-- 3D Harmonic Resonance -->
+            <div class="viz-panel">
+                <h3>🎯 3D Harmonic Resonance</h3>
+                <canvas id="resonanceCanvas"></canvas>
+                <div class="resonance-indicator">
+                    <span>Resonance Quality:</span>
+                    <div class="resonance-bar">
+                        <div class="resonance-fill" id="resonanceFill" style="width: 78%;"></div>
+                    </div>
+                    <span id="resonancePercent">78%</span>
+                </div>
+            </div>
+
+            <!-- Market Correlation Matrix -->
+            <div class="viz-panel">
+                <h3>🔗 Market Correlation Matrix</h3>
+                <canvas id="correlationCanvas"></canvas>
+                <div class="status-indicators">
+                    <div class="status-indicator">
+                        <div class="status-light status-active"></div>
+                        <div>BTC-ETH</div>
+                    </div>
+                    <div class="status-indicator">
+                        <div class="status-light status-warning"></div>
+                        <div>ETH-SOL</div>
+                    </div>
+                    <div class="status-indicator">
+                        <div class="status-light status-active"></div>
+                        <div>BTC-SOL</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Immutable Ledger -->
+            <div class="viz-panel full-width">
+                <h3>📜 Immutable Harmonic Ledger (Proof-of-Resonance)</h3>
+                <div class="immutable-ledger" id="harmonicLedger">
+                    <div class="ledger-entry">Block #1247: HRI=78.4, SSS=23.1, Freq=442.8Hz, Hash=0x7f3a9b2c...</div>
+                    <div class="ledger-entry">Block #1246: HRI=76.2, SSS=24.7, Freq=441.2Hz, Hash=0x8e4c1d5f...</div>
+                    <div class="ledger-entry">Block #1245: HRI=79.1, SSS=22.3, Freq=444.1Hz, Hash=0x9a5b2e8c...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Market Sensitivity</label>
+                <input type="range" id="sensitivity" min="0.1" max="2.0" step="0.1" value="1.0">
+                <span id="sensitivityValue">1.0x</span>
+            </div>
+            <div class="control-group">
+                <label>Harmonic Complexity</label>
+                <input type="range" id="complexity" min="1" max="8" step="1" value="4">
+                <span id="complexityValue">4</span>
+            </div>
+            <div class="control-group">
+                <label>Visualization Speed</label>
+                <input type="range" id="speed" min="0.5" max="3.0" step="0.1" value="1.0">
+                <span id="speedValue">1.0x</span>
+            </div>
+            <button onclick="toggleAudio()">🔊 Toggle Audio</button>
+            <button onclick="resetSystem()">🔄 Reset System</button>
+            <button onclick="exportData()">💾 Export Data</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let audioContext;
+        let oscillators = [];
+        let isAudioEnabled = false;
+        let animationId;
+        let currentTime = 0;
+        let marketData = {
+            btc: { price: 45234.56, change: 2.34 },
+            eth: { price: 2845.67, change: 1.89 },
+            sol: { price: 98.45, change: -0.67 }
+        };
+
+        // Canvas contexts
+        const waveformCanvas = document.getElementById('waveformCanvas');
+        const spectrumCanvas = document.getElementById('spectrumCanvas');
+        const resonanceCanvas = document.getElementById('resonanceCanvas');
+        const correlationCanvas = document.getElementById('correlationCanvas');
+
+        const waveCtx = waveformCanvas.getContext('2d');
+        const specCtx = spectrumCanvas.getContext('2d');
+        const resCtx = resonanceCanvas.getContext('2d');
+        const corrCtx = correlationCanvas.getContext('2d');
+
+        // Initialize canvases
+        function initializeCanvases() {
+            [waveformCanvas, spectrumCanvas, resonanceCanvas, correlationCanvas].forEach(canvas => {
+                canvas.width = canvas.offsetWidth * 2;
+                canvas.height = canvas.offsetHeight * 2;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(2, 2);
+            });
+        }
+
+        // Calculate harmonic frequency from market data
+        function calculateHarmonicFrequency(baseFreq, marketChange) {
+            return baseFreq * (1 + marketChange / 100);
+        }
+
+        // Generate harmonic series
+        function generateHarmonicSeries(fundamental, complexity) {
+            const harmonics = [];
+            for (let i = 1; i <= complexity; i++) {
+                harmonics.push({
+                    frequency: fundamental * i,
+                    amplitude: 1 / Math.sqrt(i),
+                    phase: 0
+                });
+            }
+            return harmonics;
+        }
+
+        // Draw real-time waveform
+        function drawWaveform() {
+            const canvas = waveformCanvas;
+            const ctx = waveCtx;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate current frequency based on market data
+            const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+            const currentFreq = calculateHarmonicFrequency(432, avgChange);
+            
+            // Update frequency display
+            document.getElementById('currentFreq').textContent = `${currentFreq.toFixed(1)} Hz`;
+
+            // Generate harmonic series
+            const complexity = parseInt(document.getElementById('complexity').value);
+            const harmonics = generateHarmonicSeries(currentFreq, complexity);
+
+            // Draw composite waveform
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            const samples = width * 2;
+            const timeScale = 0.01 * parseFloat(document.getElementById('speed').value);
+
+            for (let x = 0; x < width; x++) {
+                let y = 0;
+                
+                // Sum all harmonics
+                harmonics.forEach((harmonic, index) => {
+                    const phase = (x * timeScale + currentTime) * harmonic.frequency * 0.001;
+                    const amplitude = harmonic.amplitude * (height / 4);
+                    const color = index === 0 ? '#ffd700' : '#ff6b35';
+                    
+                    y += Math.sin(phase * Math.PI * 2) * amplitude;
+                });
+
+                y = height / 2 + y;
+
+                if (x === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+
+            // Draw individual harmonics (faded)
+            harmonics.forEach((harmonic, index) => {
+                if (index > 0) {
+                    ctx.strokeStyle = `rgba(255, 107, 53, ${0.3 / index})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+
+                    for (let x = 0; x < width; x++) {
+                        const phase = (x * timeScale + currentTime) * harmonic.frequency * 0.001;
+                        const amplitude = harmonic.amplitude * (height / 6);
+                        const y = height / 2 + Math.sin(phase * Math.PI * 2) * amplitude;
+
+                        if (x === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+
+                    ctx.stroke();
+                }
+            });
+
+            // Draw center line
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(width, height / 2);
+            ctx.stroke();
+        }
+
+        // Draw frequency spectrum
+        function drawSpectrum() {
+            const canvas = spectrumCanvas;
+            const ctx = specCtx;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate current harmonics
+            const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+            const currentFreq = calculateHarmonicFrequency(432, avgChange);
+            const complexity = parseInt(document.getElementById('complexity').value);
+            const harmonics = generateHarmonicSeries(currentFreq, complexity);
+
+            // Draw frequency bars
+            const barWidth = width / harmonics.length;
+            
+            harmonics.forEach((harmonic, index) => {
+                const x = index * barWidth;
+                const barHeight = harmonic.amplitude * height * 0.8;
+                const y = height - barHeight;
+
+                // Color gradient based on frequency
+                const hue = (harmonic.frequency - 200) / 1000 * 360;
+                ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+                
+                ctx.fillRect(x + 2, y, barWidth - 4, barHeight);
+
+                // Draw frequency label
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '10px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${harmonic.frequency.toFixed(0)}Hz`, x + barWidth/2, height - 5);
+            });
+
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const y = (height / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+        }
+
+        // Draw 3D harmonic resonance
+        function drawResonance() {
+            const canvas = resonanceCanvas;
+            const ctx = resCtx;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate resonance quality
+            const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+            const resonanceQuality = Math.max(0, Math.min(100, 50 + avgChange * 10));
+            
+            // Update resonance indicator
+            document.getElementById('resonanceFill').style.width = `${resonanceQuality}%`;
+            document.getElementById('resonancePercent').textContent = `${resonanceQuality.toFixed(1)}%`;
+
+            // Draw 3D resonance visualization
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxRadius = Math.min(width, height) / 3;
+
+            // Draw resonance rings
+            for (let ring = 1; ring <= 5; ring++) {
+                const radius = (maxRadius / 5) * ring;
+                const alpha = (resonanceQuality / 100) * (1 - ring / 6);
+                
+                ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Add pulsing effect
+                const pulseRadius = radius + Math.sin(currentTime * 0.01 + ring) * 5;
+                ctx.strokeStyle = `rgba(255, 107, 53, ${alpha * 0.5})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, pulseRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Draw center resonance point
+            const centerRadius = 8 + Math.sin(currentTime * 0.02) * 3;
+            ctx.fillStyle = `rgba(255, 215, 0, ${resonanceQuality / 100})`;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, centerRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw resonance quality text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Courier New';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${resonanceQuality.toFixed(1)}%`, centerX, centerY + 50);
+        }
+
+        // Draw market correlation matrix
+        function drawCorrelation() {
+            const canvas = correlationCanvas;
+            const ctx = corrCtx;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const assets = ['BTC', 'ETH', 'SOL'];
+            const cellSize = Math.min(width, height) / 3;
+
+            // Calculate correlations
+            const correlations = [
+                [1.0, 0.85, 0.72],  // BTC correlations
+                [0.85, 1.0, 0.68],  // ETH correlations
+                [0.72, 0.68, 1.0]   // SOL correlations
+            ];
+
+            // Draw correlation matrix
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const x = j * cellSize;
+                    const y = i * cellSize;
+                    const correlation = correlations[i][j];
+                    
+                    // Color based on correlation strength
+                    const intensity = Math.abs(correlation);
+                    const hue = correlation > 0 ? 120 : 0; // Green for positive, red for negative
+                    ctx.fillStyle = `hsla(${hue}, 70%, 50%, ${intensity})`;
+                    
+                    ctx.fillRect(x, y, cellSize - 2, cellSize - 2);
+
+                    // Draw correlation value
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '14px Courier New';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(correlation.toFixed(2), x + cellSize/2, y + cellSize/2);
+
+                    // Draw asset labels
+                    if (i === 0) {
+                        ctx.fillText(assets[j], x + cellSize/2, 15);
+                    }
+                    if (j === 0) {
+                        ctx.save();
+                        ctx.translate(15, y + cellSize/2);
+                        ctx.rotate(-Math.PI/2);
+                        ctx.fillText(assets[i], 0, 0);
+                        ctx.restore();
+                    }
+                }
+            }
+        }
+
+        // Update market data (simulated)
+        function updateMarketData() {
+            // Simulate market changes
+            marketData.btc.change += (Math.random() - 0.5) * 0.5;
+            marketData.eth.change += (Math.random() - 0.5) * 0.4;
+            marketData.sol.change += (Math.random() - 0.5) * 0.6;
+
+            // Keep changes within reasonable bounds
+            marketData.btc.change = Math.max(-10, Math.min(10, marketData.btc.change));
+            marketData.eth.change = Math.max(-10, Math.min(10, marketData.eth.change));
+            marketData.sol.change = Math.max(-10, Math.min(10, marketData.sol.change));
+
+            // Update prices
+            marketData.btc.price *= (1 + marketData.btc.change / 10000);
+            marketData.eth.price *= (1 + marketData.eth.change / 10000);
+            marketData.sol.price *= (1 + marketData.sol.change / 10000);
+
+            // Update display
+            document.getElementById('btc-price').textContent = `$${marketData.btc.price.toFixed(2)}`;
+            document.getElementById('eth-price').textContent = `$${marketData.eth.price.toFixed(2)}`;
+            document.getElementById('sol-price').textContent = `$${marketData.sol.price.toFixed(2)}`;
+
+            document.getElementById('btc-change').textContent = `${marketData.btc.change >= 0 ? '+' : ''}${marketData.btc.change.toFixed(2)}%`;
+            document.getElementById('eth-change').textContent = `${marketData.eth.change >= 0 ? '+' : ''}${marketData.eth.change.toFixed(2)}%`;
+            document.getElementById('sol-change').textContent = `${marketData.sol.change >= 0 ? '+' : ''}${marketData.sol.change.toFixed(2)}%`;
+
+            // Update change colors
+            document.getElementById('btc-change').className = `market-change ${marketData.btc.change >= 0 ? 'positive' : 'negative'}`;
+            document.getElementById('eth-change').className = `market-change ${marketData.eth.change >= 0 ? 'positive' : 'negative'}`;
+            document.getElementById('sol-change').className = `market-change ${marketData.sol.change >= 0 ? 'positive' : 'negative'}`;
+        }
+
+        // Add ledger entry
+        function addLedgerEntry() {
+            const ledger = document.getElementById('harmonicLedger');
+            const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+            const currentFreq = calculateHarmonicFrequency(432, avgChange);
+            const hri = Math.max(0, Math.min(100, 50 + avgChange * 5));
+            const sss = Math.max(0, Math.min(100, 30 - avgChange * 2));
+            const blockNum = 1248 + Math.floor(currentTime / 1000);
+            const hash = Math.random().toString(16).substr(2, 8);
+
+            const entry = document.createElement('div');
+            entry.className = 'ledger-entry';
+            entry.textContent = `Block #${blockNum}: HRI=${hri.toFixed(1)}, SSS=${sss.toFixed(1)}, Freq=${currentFreq.toFixed(1)}Hz, Hash=0x${hash}...`;
+            
+            ledger.insertBefore(entry, ledger.firstChild);
+            
+            // Keep only last 10 entries
+            while (ledger.children.length > 10) {
+                ledger.removeChild(ledger.lastChild);
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            currentTime += 16; // ~60fps
+
+            updateMarketData();
+            drawWaveform();
+            drawSpectrum();
+            drawResonance();
+            drawCorrelation();
+
+            // Add ledger entry every 2 seconds
+            if (currentTime % 2000 < 16) {
+                addLedgerEntry();
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Control functions
+        function toggleAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (isAudioEnabled) {
+                // Stop audio
+                oscillators.forEach(osc => osc.stop());
+                oscillators = [];
+                isAudioEnabled = false;
+            } else {
+                // Start audio
+                const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+                const currentFreq = calculateHarmonicFrequency(432, avgChange);
+                const complexity = parseInt(document.getElementById('complexity').value);
+                const harmonics = generateHarmonicSeries(currentFreq, complexity);
+
+                harmonics.forEach(harmonic => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.frequency.setValueAtTime(harmonic.frequency, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(harmonic.amplitude * 0.1, audioContext.currentTime);
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.start();
+                    oscillators.push(oscillator);
+                });
+
+                isAudioEnabled = true;
+            }
+        }
+
+        function resetSystem() {
+            marketData = {
+                btc: { price: 45234.56, change: 2.34 },
+                eth: { price: 2845.67, change: 1.89 },
+                sol: { price: 98.45, change: -0.67 }
+            };
+            currentTime = 0;
+            document.getElementById('harmonicLedger').innerHTML = '';
+        }
+
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                marketData: marketData,
+                harmonicData: {
+                    baseFrequency: 432,
+                    currentFrequency: calculateHarmonicFrequency(432, (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3),
+                    complexity: parseInt(document.getElementById('complexity').value)
+                },
+                ledgerEntries: Array.from(document.getElementById('harmonicLedger').children).map(entry => entry.textContent)
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `orion-rangi-data-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Control event listeners
+        document.getElementById('sensitivity').addEventListener('input', (e) => {
+            document.getElementById('sensitivityValue').textContent = `${e.target.value}x`;
+        });
+
+        document.getElementById('complexity').addEventListener('input', (e) => {
+            document.getElementById('complexityValue').textContent = e.target.value;
+        });
+
+        document.getElementById('speed').addEventListener('input', (e) => {
+            document.getElementById('speedValue').textContent = `${e.target.value}x`;
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            initializeCanvases();
+            animate();
+        });
+
+        window.addEventListener('resize', () => {
+            initializeCanvases();
+        });
+    </script>
+</body>
+</html>
+
