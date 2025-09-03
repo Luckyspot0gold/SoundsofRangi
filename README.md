@@ -1,3 +1,39 @@
+# SoundsoftRangi - Harmonic Financial Sonification Platform
+
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.8%2B-green)
+![TypeScript](https://img.shields.io/badge/TypeScript-4.0%2B-blue)
+
+A revolutionary platform that transforms financial market data into harmonic audio experiences using advanced cymatic principles and sonification techniques.
+
+## 🌟 Features
+
+- **Real-time Market Sonification**: Convert live financial data into audible frequencies
+- **Cymatic Visualization**: Visual representations of market energy patterns
+- **Haptic Feedback Integration**: Physical vibration responses to market movements
+- **ADA-Compatible**: Accessible financial analysis for all users
+- **Harmonic Analysis**: Identify market patterns through audio signatures
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8+
+- Node.js 14+
+- Audio capable device
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/SoundsoftRangi/SoundsoftRangi.git
+cd SoundsoftRangi
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Install frontend dependencies
+cd app
+npm install
 <a href="https://chat.vercel.ai/">
   <img alt="Next.js 14 and App Router-ready AI chatbot." src="app/(chat)/opengraph-image.png">
   <h1 align="center">Chat SDK</h1>
