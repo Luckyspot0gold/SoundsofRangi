@@ -1,0 +1,27 @@
+import numpy as np
+from .bell_resonance import BellResonance
+
+class SevenBells:
+    def __init__(self):
+        self.bells = {
+            "clarity": {"freq": 396, "action": "cut", "phrase": "RELEASE"},
+            "strength": {"freq": 417, "action": "hold", "phrase": "ROOT"},
+            "transformation": {"freq": 528, "action": "shift", "phrase": "SHIFT"},
+            "integrity": {"freq": 639, "action": "balance", "phrase": "CONNECT"},
+            "intuition": {"freq": 741, "action": "wait", "phrase": "SILENCE"},
+            "manifestation": {"freq": 852, "action": "buy", "phrase": "ASCEND"},
+            "sovereignty": {"freq": 963, "action": "override", "phrase": "I AM"}
+        }
+        self.resonance = BellResonance()
+
+    def trigger_bell(self, bell_name: str, intensity: float = 1.0):
+        bell = self.bells.get(bell_name)
+        if bell:
+            # Generate audio tone
+            self.resonance.generate_tone(bell['freq'], intensity)
+            # Return phrase and action for haptic/visual feedback
+            return {
+                "phrase": bell['phrase'],
+                "action": bell['action'],
+                "frequency": bell['freq']
+            }
