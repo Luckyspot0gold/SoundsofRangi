@@ -1,0 +1,15 @@
+/soundsofrangi
+│
+├── /src
+│   ├── bells/
+│   │   ├── bell_controller.py
+│   │   ├── bell_resonance.py
+│   │   └── bell_patterns.py
+│   ├── utils/
+│   │   ├── audio_engine.py
+│   │   ├── haptic_engine.py
+│   │   └── market_listener.py
+│   └── app.py
+│
+├── requirements.txt
+└── README.md
