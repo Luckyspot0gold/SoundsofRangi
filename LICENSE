@@ -1,3 +1,19 @@
+Reality Protocol LLC
+Shridan Wyoming 
+WWW.RealityProtocol.io
+"""
+PROPRIETARY AND CONFIDENTIAL
+Reality Protocol LLC Harmonic Resonance Keptic Visualization System
+Copyright (c) 2025 Reality Protocol LLC. All Rights Reserved.
+
+This source code is provided for evaluation purposes only.
+Unauthorized use, copying, or distribution is strictly prohibited.
+
+Licensing inquiries: licensing@realityprotocol.io
+"""
+rm -f LICENSE.md  # Remove any existing license
+echo "# PROPRIETARY LICENSE AGREEMENT" > LICENSE.md
+# [Add the full license content from above]
 Copyright 2024 Vercel, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
