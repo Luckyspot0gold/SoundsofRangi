@@ -1,0 +1,18 @@
+flowchart TD
+    A[Market Data] --> B[Harmonic Engine<br/>Generates base tone & modulation]
+    B --> C{Phonics Router}
+    D[Technical Indicators<br/>RSI, MACD, Volatility] --> E[Phonics Intelligence Layer<br/>Analyzes data for meaning]
+    E --> C
+    C --> F[Audio Output Mixer]
+    
+    C -.->|Command: “Warn user”| G
+    subgraph G [Phonics Implementation]
+        H[Text-to-Speech TTS<br/>e.g., “Warning: RSI overheating”]
+        I[Symbolic Sound Alerts<br/>e.g., A sharp, quick chime]
+        J[Prosody Engine<br/>Adjusts speech speed, pitch for urgency]
+    end
+
+    G --> F
+    B --> F
+
+    F --> K[Final Audio Output<br/>Harmonic soundscape + intelligent voiceovers]
