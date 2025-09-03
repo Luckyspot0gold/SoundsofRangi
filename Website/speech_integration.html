@@ -1,0 +1,16 @@
+<button onclick="speakMarketMessage()">Hear Market Insight</button>
+
+<script>
+function speakMarketMessage() {
+    // Get market data from your existing system
+    const marketState = getMarketState(); 
+    
+    // Create speech output
+    const speech = new SpeechSynthesisUtterance();
+    speech.text = `Current market vibe: ${marketState.vibe}. The RSI is ${marketState.rsi}.`;
+    speech.rate = 1.0; // Prosody - speed
+    speech.pitch = marketState.urgency; // Prosody - pitch based on urgency
+    
+    window.speechSynthesis.speak(speech);
+}
+</script>
