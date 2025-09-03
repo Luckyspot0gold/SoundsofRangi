@@ -1,0 +1,26 @@
+# Invention Disclosure: [INVENTION NAME]
+**Inventor:** Justin William McCrea
+**Date of Conception:** [Today's Date]
+**Status:** Proof of Concept
+
+## 1. Abstract
+A clear, one-paragraph description of the invention and its novel purpose.
+
+## 2. Background
+The problem this invention solves. Why existing solutions are inadequate.
+
+## 3. Detailed Description
+*   **How it works:** Step-by-step explanation of the system, its components, and their interaction.
+*   **Novel Features:** What makes this new, non-obvious, and useful? Be specific.
+    *   "Novel method of mapping market data to a 432Hz base frequency for multi-sensory sonification."
+    *   "Unique algorithm for generating cymatic patterns from financial volatility data."
+*   **Technical Specifications:** Include code snippets, architecture diagrams (Mermaid.js), and formulas.
+
+## 4. Potential Claims
+Draft what would be the patent claims:
+1.  A system for...[describe the first broad claim].
+2.  The system of claim 1, further comprising...[add a specific feature].
+
+## 5. Supporting Evidence
+- Links to public repositories that demonstrate a proof-of-concept (`Luckyspot0gold/BullvsBear`, etc.).
+- Screenshots, video recordings of the system working.
