@@ -1,0 +1,1076 @@
+curl https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/workers/dispatch/namespaces/$DISPATCH_NAMESPACE/scripts/$SCRIPT_NAME \
+
+    -X PUT \
+
+    -H 'Content-Type: multipart/form-data' \
+
+    -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+
+    -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
+
+    -F metadata='{}'
+
+export default {
+
+  async fetch(request, env) {
+
+    const tasks = [];
+
+
+
+    // prompt - simple completion style input
+
+    let simple = {
+
+      prompt: 'Tell me a joke about Cloudflare'
+
+    };
+
+    let response = await env.AI.run('@cf/meta/llama-3-8b-instruct', simple);
+
+    tasks.push({ inputs: simple, response });
+
+
+
+    // messages - chat style input
+
+    let chat = {
+
+      messages: [
+
+        { role: 'system', content: 'You are a helpful assistant.' },
+
+        { role: 'user', content: 'Who won the world series in 2020?' }
+
+      ]
+
+    };
+
+    response = await env.AI.run('@cf/meta/llama-3-8b-instruct', chat);
+
+    tasks.push({ inputs: chat, response });
+
+
+
+    return Response.json(tasks);
+
+  }
+
+};
+
+/// integrate the WalletModal into your Orion Protocol with connections to all your platforms:
+
+
+### 1. First, update your Orion Protocol dependencies
+
+```bash
+
+npm install @coinbase/onchainkit @rainbow-me/rainbowkit wagmi viem
+
+```
+
+
+### 2. Enhanced `providers.tsx` with Multi-Project Support
+
+```tsx
+
+// app/providers.tsx
+
+'use client';
+
+import { 
+
+  OnchainKitProvider, 
+
+  useAccount, 
+
+  useChainId 
+
+} from '@coinbase/onchainkit';
+
+import { base, polygon, optimism } from 'viem/chains';
+
+import { createConfig, http } from 'wagmi';
+
+import { injected } from 'wagmi/connectors';
+
+
+const projectConfig = {
+
+  'Orion Protocol': {
+
+    id: 'orion',
+
+    chains: [base],
+
+    theme: 'dark'
+
+  },
+
+  'CryptoClashers': {
+
+    id: 'clashers',
+
+    chains: [polygon],
+
+    theme: 'light'
+
+  },
+
+  'StoneYard Games': {
+
+    id: 'stoneyard',
+
+    chains: [optimism],
+
+    theme: 'stone'
+
+  }
+
+};
+
+
+export function Providers({ children }) {
+
+  const currentProject = process.env.NEXT_PUBLIC_ACTIVE_PROJECT || 'orion';
+
+  const config = projectConfig[currentProject];
+
+  
+
+  const wagmiConfig = createConfig({
+
+    chains: config.chains,
+
+    connectors: [injected()],
+
+    transports: {
+
+      [base.id]: http(),
+
+      [polygon.id]: http(),
+
+      [optimism.id]: http()
+
+    }
+
+  });
+
+
+  return (
+
+    <OnchainKitProvider
+
+      apiKey={process.env.ONCHAINKIT_API_KEY}
+
+      chain={config.chains[0]}
+
+      config={{
+
+        appearance: {
+
+          name: currentProject,
+
+          logo: getProjectLogo(currentProject),
+
+          mode: 'auto',
+
+          theme: config.theme,
+
+          // Add your project identities
+
+          developer: {
+
+            github: 'Luckyspot0gold',
+
+            cbId: 'Luckysnagbags',
+
+            projects: [
+
+              'realityprotocol.io',
+
+              'cryptoclashers.games',
+
+              'stoneyard.cash'
+
+            ]
+
+          }
+
+        },
+
+        wallet: {
+
+          display: 'modal',
+
+          termsUrl: 'https://realityprotocol.io/terms',
+
+          privacyUrl: 'https://realityprotocol.io/privacy',
+
+          // Add connection to your other projects
+
+          projectLinks: [
+
+            { name: 'Vercel AI', url: 'https://vercel.ai' },
+
+            { name: 'Vectal AI', url: 'https://vectal.ai' },
+
+            { name: 'v0', url: 'https://v0.dev' }
+
+          ]
+
+        },
+
+      }}
+
+      wagmiConfig={wagmiConfig}
+
+    >
+
+      {children}
+
+    </OnchainKitProvider>
+
+  );
+
+}
+
+
+// Helper to get project logos
+
+function getProjectLogo(projectId: string) {
+
+  const logos = {
+
+    orion: '/logos/orion.svg',
+
+    clashers: '/logos/clashers.png',
+
+    stoneyard: '/logos/stoneyard.png'
+
+  };
+
+  return logos[projectId] || '/logos/default.svg';
+
+}
+
+```
+
+
+### 3. Smart Wallet Component with Multi-Project Switching
+
+```tsx
+
+// components/SmartWallet.tsx
+
+'use client';
+
+import { 
+
+  Wallet,
+
+  ConnectWallet,
+
+  WalletDropdown,
+
+  Avatar,
+
+  Name,
+
+  Address,
+
+  EthBalance,
+
+  WalletDropdownDisconnect
+
+} from '@coinbase/onchainkit';
+
+import { Identity } from '@coinbase/onchainkit/identity';
+
+import { useRouter } from 'next/navigation';
+
+
+export default function SmartWallet() {
+
+  const router = useRouter();
+
+  
+
+  // Handle project switching
+
+  const handleProjectChange = (project: string) => {
+
+    localStorage.setItem('activeProject', project);
+
+    router.refresh();
+
+  };
+
+
+  return (
+
+    <div className="fixed bottom-6 right-6 z-50">
+
+      <Wallet>
+
+        <ConnectWallet>
+
+          <Avatar className="h-10 w-10 border-2 border-orion-500" />
+
+        </ConnectWallet>
+
+        
+
+        <WalletDropdown className="min-w-[300px] bg-gradient-to-br from-gray-900 to-black border border-orion-700 rounded-xl shadow-xl">
+
+          <Identity className="p-5" hasCopyAddressOnClick>
+
+            <div className="flex items-center space-x-4 mb-4">
+
+              <Avatar className="h-14 w-14" />
+
+              <div>
+
+                <Name className="text-xl font-bold text-orion-100" />
+
+                <Address className="text-orion-300 text-sm" />
+
+              </div>
+
+            </div>
+
+            <EthBalance className="text-2xl font-mono text-orion-100" />
+
+          </Identity>
+
+          
+
+          <div className="p-4 border-t border-orion-800">
+
+            <h3 className="text-orion-300 text-sm mb-2">Your Projects:</h3>
+
+            <div className="grid grid-cols-3 gap-2">
+
+              <ProjectButton 
+
+                name="Orion" 
+
+                onClick={() => handleProjectChange('orion')} 
+
+              />
+
+              <ProjectButton 
+
+                name="CryptoClashers" 
+
+                onClick={() => handleProjectChange('clashers')} 
+
+              />
+
+              <ProjectButton 
+
+                name="StoneYard" 
+
+                onClick={() => handleProjectChange('stoneyard')} 
+
+              />
+
+            </div>
+
+          </div>
+
+          
+
+          <WalletDropdownDisconnect className="p-4 text-orion-300 hover:bg-orion-800 transition-colors border-t border-orion-800" />
+
+        </WalletDropdown>
+
+      </Wallet>
+
+    </div>
+
+  );
+
+}
+
+
+const ProjectButton = ({ name, onClick }) => (
+
+  <button 
+
+    onClick={onClick}
+
+    className="bg-orion-800 hover:bg-orion-700 rounded-lg p-2 text-xs text-center transition-colors"
+
+  >
+
+    {name}
+
+  </button>
+
+);
+
+```
+
+
+### 4. Updated Layout with Project Detection
+
+```tsx
+
+// app/layout.tsx
+
+import { Providers } from './providers';
+
+import SmartWallet from '@/components/SmartWallet';
+
+
+export default function RootLayout({ children }) {
+
+  // Detect active project from localStorage or URL
+
+  const getActiveProject = () => {
+
+    if (typeof window !== 'undefined') {
+
+      return localStorage.getItem('activeProject') || 'orion';
+
+    }
+
+    return 'orion';
+
+  };
+
+  
+
+  process.env.NEXT_PUBLIC_ACTIVE_PROJECT = getActiveProject();
+
+
+  return (
+
+    <html lang="en" data-theme={getActiveProject()}>
+
+      <body className="bg-gray-950 text-orion-100 min-h-screen">
+
+        <Providers>
+
+          {children}
+
+          <SmartWallet />
+
+        </Providers>
+
+      </body>
+
+    </html>
+
+  );
+
+}
+
+```
+
+
+### 5. Environment Variables (`.env.local`)
+
+```env
+
+ONCHAINKIT_API_KEY=ok_pub_YourApiKeyHere
+
+NEXT_PUBLIC_DEFAULT_CHAIN=base
+
+
+# Project-specific settings
+
+ORION_RPC_URL=https://base-mainnet.g.alchemy.com/v2/your-key
+
+CLASHERS_RPC_URL=https://polygon-mainnet.g.alchemy.com/v2/your-key
+
+STONEYARD_RPC_URL=https://optimism-mainnet.g.alchemy.com/v2/your-key
+
+```
+
+
+### 6. Add Project Detection Middleware
+
+```ts
+
+// middleware.ts
+
+import { NextRequest, NextResponse } from 'next/server';
+
+
+export function middleware(request: NextRequest) {
+
+  const project = request.nextUrl.pathname.split('/')[1];
+
+  const validProjects = ['orion', 'clashers', 'stoneyard'];
+
+  
+
+  if (validProjects.includes(project)) {
+
+    const response = NextResponse.next();
+
+    response.cookies.set('activeProject', project);
+
+    return response;
+
+  }
+
+  
+
+  return NextResponse.next();
+
+}
+
+///{
+
+  "rdapConformance": [
+
+    "rdap_level_0",
+
+    "icann_rdap_response_profile_1",
+
+    "icann_rdap_technical_implementation_guide_1",
+
+    "redacted"
+
+  ],
+
+  "notices": [
+
+    {
+
+      "title": "Terms of Service",
+
+      "description": [
+
+        "Access to RDAP information is provided to assist persons in determining the contents of a domain name registration record in the registry database. The data in this record is provided by Identity Digital or, if the record pertains to a TLD not operated by Identity Digital, then the corresponding primary Registry Operator for informational purposes only, and neither Identity Digital nor the Registry Operator guarantee its accuracy. This service is intended only for query-based access. You agree that you will use this data only for lawful purposes and that, under no circumstances will you use this data to (a) allow, enable, or otherwise support the transmission by e-mail, telephone, or facsimile of mass unsolicited, commercial advertising or solicitations to entities other than the data recipient's own existing customers; or (b) enable high volume, automated, electronic processes that send queries or data to the systems of Identity Digital, a Registrar, or Registry Operator except as reasonably necessary to register domain names or modify existing registrations. When using the RDAP service, please consider the following: the RDAP service is not a replacement for standard EPP commands to the SRS service. RDAP is not considered authoritative for registered domain objects. The RDAP service may be scheduled for downtime during production or OT&E maintenance periods. Queries to the RDAP services are throttled. If too many queries are received from a single IP address within a specified time, the service will begin to reject further queries for a period of time to prevent disruption of RDAP service access. Abuse of the RDAP system through data mining is mitigated by detecting and limiting bulk query access from single sources. Where applicable, the presence of a [Non-Public Data] tag indicates that such data is not made publicly available due to applicable data privacy laws or requirements. Should you wish to contact the registrant, please refer to the RDAP records available through the registrar URL listed above. Access to non-public data may be provided, upon request, where it can be reasonably confirmed that the requester holds a specific legitimate interest and a proper legal basis for accessing the withheld data. Access to the data provided by Identity Digital can be requested by submitting a request via the form found at https://www.identity.digital/about/policies/whois-layered-access/ Identity Digital Inc. and, if applicable, the primary Registry Operators reserve the right to modify these terms at any time. By submitting this query, you agree to abide by this policy."
+
+      ],
+
+      "links": [
+
+        {
+
+          "value": "https://rdap.identitydigital.services/rdap/domain/cryptoclashers.games",
+
+          "rel": "terms-of-service",
+
+          "href": "https://www.identity.digital/policies/rdds-access-policy",
+
+          "type": "text/html"
+
+        }
+
+      ]
+
+    },
+
+    {
+
+      "title": "Status Codes",
+
+      "description": [
+
+        "For more information on domain status codes, please visit https://icann.org/epp"
+
+      ],
+
+      "links": [
+
+        {
+
+          "value": "https://icann.org/epp",
+
+          "rel": "glossary",
+
+          "href": "https://icann.org/epp",
+
+          "type": "application/rdap+json"
+
+        }
+
+      ]
+
+    },
+
+    {
+
+      "title": "RDDS Inaccuracy Complaint Form",
+
+      "description": [
+
+        "URL of the ICANN RDDS Inaccuracy Complaint Form: https://icann.org/wicf"
+
+      ],
+
+      "links": [
+
+        {
+
+          "value": "https://rdap.identitydigital.services/rdap/domain/cryptoclashers.games",
+
+          "rel": "help",
+
+          "href": "https://icann.org/wicf",
+
+          "type": "application/rdap+json"
+
+        }
+
+      ]
+
+    }
+
+  ],
+
+  "ldhName": "cryptoclashers.games",
+
+  "unicodeName": "cryptoclashers.games",
+
+  "nameservers": [
+
+    {
+
+      "ldhName": "carla.ns.cloudflare.com",
+
+      "unicodeName": "carla.ns.cloudflare.com",
+
+      "objectClassName": "nameserver",
+
+      "handle": "66293bdb774f42d880b2a89197d0d9e0-DONUTS",
+
+      "status": [
+
+        "associated"
+
+      ]
+
+    },
+
+    {
+
+      "ldhName": "milan.ns.cloudflare.com",
+
+      "unicodeName": "milan.ns.cloudflare.com",
+
+      "objectClassName": "nameserver",
+
+      "handle": "7fb1042df1a14142866008c40f943e99-DONUTS",
+
+      "status": [
+
+        "associated"
+
+      ]
+
+    }
+
+  ],
+
+  "secureDNS": {
+
+    "delegationSigned": true,
+
+    "maxSigLife": 1,
+
+    "dsData": [
+
+      {
+
+        "keyTag": 2371,
+
+        "algorithm": 13,
+
+        "digest": "5BF94960F9317664EFE926E39337771C72280DA9B2D6459B171E65D46C9E0D57",
+
+        "digestType": 2
+
+      }
+
+    ]
+
+  },
+
+  "publicIds": [
+
+    {
+
+      "type": "IANA Registrar ID",
+
+      "identifier": "1910"
+
+    }
+
+  ],
+
+  "redacted": [
+
+    {
+
+      "name": {
+
+        "type": "Registry Domain ID"
+
+      },
+
+      "prePath": "$.handle",
+
+      "pathLang": "jsonpath",
+
+      "method": "removal"
+
+    }
+
+  ],
+
+  "objectClassName": "domain",
+
+  "status": [
+
+    "client transfer prohibited"
+
+  ],
+
+  "events": [
+
+    {
+
+      "eventAction": "expiration",
+
+      "eventDate": "2026-06-23T10:35:02.517Z"
+
+    },
+
+    {
+
+      "eventAction": "registration",
+
+      "eventDate": "2025-06-23T10:35:02.517Z"
+
+    },
+
+    {
+
+      "eventAction": "last changed",
+
+      "eventDate": "2025-06-28T10:35:37.084Z"
+
+    },
+
+    {
+
+      "eventAction": "last update of RDAP database",
+
+      "eventDate": "2025-08-17T06:33:27.373Z"
+
+    }
+
+  ],
+
+  "entities": [
+
+    {
+
+      "vcardArray": [
+
+        "vcard",
+
+        [
+
+          [
+
+            "version",
+
+            {},
+
+            "text",
+
+            "4.0"
+
+          ],
+
+          [
+
+            "fn",
+
+            {},
+
+            "text",
+
+            "Cloudflare, Inc"
+
+          ]
+
+        ]
+
+      ],
+
+      "roles": [
+
+        "registrar"
+
+      ],
+
+      "publicIds": [
+
+        {
+
+          "type": "IANA Registrar ID",
+
+          "identifier": "1910"
+
+        }
+
+      ],
+
+      "objectClassName": "entity",
+
+      "handle": "1910",
+
+      "entities": [
+
+        {
+
+          "vcardArray": [
+
+            "vcard",
+
+            [
+
+              [
+
+                "version",
+
+                {},
+
+                "text",
+
+                "4.0"
+
+              ],
+
+              [
+
+                "fn",
+
+                {},
+
+                "text",
+
+                "Registrar Notices"
+
+              ],
+
+              [
+
+                "email",
+
+                {},
+
+                "text",
+
+                "registrar-notices@cloudflare.com"
+
+              ]
+
+            ]
+
+          ],
+
+          "roles": [
+
+            "abuse"
+
+          ],
+
+          "objectClassName": "entity",
+
+          "handle": "6791871a5abc47aaa391080ca2c98f9e-IdentityDigital"
+
+        }
+
+      ],
+
+      "links": [
+
+        {
+
+          "value": "https://rdap.identitydigital.services/rdap/entity/1910",
+
+          "rel": "self",
+
+          "href": "https://rdap.identitydigital.services/rdap/entity/1910",
+
+          "type": "application/rdap+json"
+
+        },
+
+        {
+
+          "value": "https://rdap.cloudflare.com/rdap/v1/",
+
+          "rel": "about",
+
+          "href": "https://rdap.cloudflare.com/rdap/v1/",
+
+          "type": "application/rdap+json"
+
+        }
+
+      ]
+
+    }
+
+  ],
+
+  "links": [
+
+    {
+
+      "value": "https://rdap.identitydigital.services/rdap/domain/cryptoclashers.games",
+
+      "rel": "related",
+
+      "href": "https://rdap.cloudflare.com/rdap/v1/domain/cryptoclashers.games",
+
+      "type": "application/rdap+json"
+
+    },
+
+    {
+
+      "value": "https://rdap.identitydigital.services/rdap/domain/cryptoclashers.games",
+
+      "rel": "self",
+
+      "href": "https://rdap.identitydigital.services/rdap/domain/cryptoclashers.games",
+
+      "type": "application/rdap+json"
+
+    }
+
+  ]
+
+}
+
+Write
+
+Compose
+
+Reply
+
+Format:
+
+Essay
+
+Paragraph
+
+Email
+
+Idea
+
+Blog Post
+
+Outline
+
+Marketing Ads
+
+Comment
+
+Message
+
+Twitter
+
+Tone:
+
+🙂 Formal
+
+😉 Casual
+
+🧐 Professional
+
+🤩 Enthusiastic
+
+🤓 Informational
+
+😄 Funny
+
+Length:
+
+Short
+
+Medium
+
+Long
+
+Language:
+
+አማርኛالعربيةБългарскиবাংলাCatalàČeštinaDanskDeutschΕλληνικάEnglishEspañolEestiفارسیSuomiFilipinoFrançaisગુજરાતીעבריתहिन्दीHrvatskiMagyarBahasa IndonesiaItaliano日本語ಕನ್ನಡ한국어LietuviųLatviešuമലയാളംमराठीBahasa MelayuNederlandsNorskPolskiPortuguêsRomânăРусскийSlovenčinaSlovenščinaСрпскиSvenskaKiswahiliதமிழ்తెలుగుไทยTürkçeУкраїнськаاردوTiếng Việt简体中文繁體中文
+
+Submit (enter)
+
+Make a Review & Earn Credit ❤
+
+Chat
+
+Ask
+
+Search
+
+Write
+
+Image
+
+ChatFile
+
+Vision
+
+Full Page
+
+Invite & Earn
+
+```
+
+
+### Key Features:
+
+1. **Multi-Project Support**: Switch between Orion, CryptoClashers, and StoneYard with wallet persistence
+
+2. **Unified Identity**: Same wallet works across all your projects
+
+3. **Project Detection**: Automatically detects project from URL path
+
+4. **Developer Attribution**: Shows your GitHub and CB.ID in wallet modal
+
+5. **Project Links**: Direct access to Vercel AI, Vectal AI, and v0
+
+6. **Theme Switching**: Each project has its own theme
+
+7. **Floating Design**: Non-intrusive bottom-right positioning
+
+
+To use different projects:
+
+- `https://realityprotocol.io/orion`
+
+- `https://realityprotocol.io/clashers`
+
+- `https://realityprotocol.io/stoneyard`
+
+
+The wallet will automatically:
+
+1. Show balances in the correct chain currency
+
+2. Maintain connection when switching projects
+
+3. Display project-specific branding
+
+4. Track activity across all your platforms
+
+
+AI projects (Vercel AI, Vectal AI, v0),add quick access links in the wallet modal's configuration section.
+
+
