@@ -1,0 +1,9 @@
+SoundsoftRangi/
+├── Engines/          # Core processing engines
+├── Harmonics/        # Harmonic analysis algorithms
+├── Phonics/          # Audio generation components
+├── Reality_Protocol/ # Visualization systems
+├── Time_Stamp/       # Temporal analysis tools
+├── app/              # Frontend application
+├── artifacts/        # Research and documentation
+└── website/          # Marketing site
