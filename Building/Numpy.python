@@ -1,0 +1,146 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+import scipy.io.wavfile as wavfile
+import pygame
+import time
+from flask import Flask, jsonify, request, render_template
+
+app = Flask(__name__)
+
+class UnifiedEnergyEngine:
+    def __init__(self, grid_size=400):
+        self.grid_size = grid_size
+        self.base_freq = 432.0
+        self.return_freq = 111.11
+        self.note_colors = {
+            'A': '#FF0000', 'B': '#FFA500', 'C': '#FFFF00',
+            'D': '#00FF00', 'E': '#0000FF', 'F': '#4B0082', 'G': '#8B00FF'
+        }
+        
+        # Initialize pygame for audio
+        pygame.mixer.init()
+
+    def generate_cymatic_pattern(self, frequency, amplitude=1.0):
+        """Generate cymatic pattern based on frequency"""
+        x = np.linspace(-np.pi, np.pi, self.grid_size)
+        y = np.linspace(-np.pi, np.pi, self.grid_size)
+        X, Y = np.meshgrid(x, y)
+        Z = np.sin(frequency * X) * np.sin(frequency * Y)
+        return Z * amplitude
+
+    def generate_pattern_b64(self, frequency, amplitude=1.0, cmap='inferno'):
+        """Generates a base64 encoded image for web display."""
+        Z = self.generate_cymatic_pattern(frequency, amplitude)
+        
+        fig, ax = plt.subplots(figsize=(6, 6), dpi=80)
+        ax.imshow(Z, cmap=cmap, extent=[-1, 1, -1, 1])
+        ax.axis('off')
+        fig.tight_layout(pad=0)
+        
+        # Save to buffer and encode
+        buf = BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
+        plt.close(fig)
+        buf.seek(0)
+        
+        return base64.b64encode(buf.read()).decode('utf-8')
+
+    def generate_audio(self, frequency, duration=3.0, sample_rate=44100):
+        """Generate audio for the given frequency"""
+        t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+        audio_data = np.sin(2 * np.pi * frequency * t)
+        
+        # Apply fade in/out to avoid clicks
+        fade_samples = int(sample_rate * 0.1)
+        audio_data[:fade_samples] *= np.linspace(0, 1, fade_samples)
+        audio_data[-fade_samples:] *= np.linspace(1, 0, fade_samples)
+        
+        # Normalize to 16-bit range
+        audio_data = (audio_data * 32767).astype(np.int16)
+        
+        # Convert to bytes
+        buf = BytesIO()
+        wavfile.write(buf, sample_rate, audio_data)
+        buf.seek(0)
+        
+        return base64.b64encode(buf.read()).decode('utf-8')
+
+    def play_frequency(self, frequency, duration=3.0):
+        """Play the frequency through audio output"""
+        sample_rate = 44100
+        t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+        audio_data = np.sin(2 * np.pi * frequency * t)
+        
+        # Apply fade
+        fade_samples = int(sample_rate * 0.1)
+        audio_data[:fade_samples] *= np.linspace(0, 1, fade_samples)
+        audio_data[-fade_samples:] *= np.linspace(1, 0, fade_samples)
+        
+        # Normalize and convert to pygame sound
+        audio_data = (audio_data * 32767).astype(np.int16)
+        sound = pygame.sndarray.make_sound(audio_data.reshape(-1, 1))
+        sound.play()
+        time.sleep(duration)
+
+    def process_market_data(self, market_input):
+        """The enhanced harmonic core with cymatic visualization and audio"""
+        # Calculate Core Harmonic Frequency
+        market_amplitude = 1.0 + ((market_input['change_24h'] * 0.5) + 
+                                 (market_input['rsi'] - 50) * 0.01) / 10
+        core_frequency = self.base_freq * market_amplitude
+
+        # Apply "Return to Sender" principle
+        is_extreme = market_input['rsi'] > 80 or market_input['rsi'] < 20
+        if is_extreme:
+            core_frequency = self.return_freq * (1 + (market_input['volume'] / 10000000))
+
+        # Generate Cymatic Pattern
+        cymatic_image_b64 = self.generate_pattern_b64(
+            frequency=core_frequency/100,  # Scale for visual patterns
+            amplitude=market_amplitude,
+            cmap='plasma'
+        )
+        
+        # Generate Audio
+        audio_b64 = self.generate_audio(core_frequency)
+
+        return {
+            'frequency': core_frequency,
+            'cymatic_pattern': cymatic_image_b64,
+            'audio_data': audio_b64,
+            'state': 'extreme_reversion' if is_extreme else 'harmonic_flow'
+        }
+
+# Initialize the engine
+engine = UnifiedEnergyEngine()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/cymatic', methods=['POST'])
+def cymatic_endpoint():
+    market_data = request.get_json()
+    result = engine.process_market_data(market_data)
+    
+    return jsonify({
+        'status': 'success',
+        'frequency': result['frequency'],
+        'cymatic_pattern': result['cymatic_pattern'],
+        'audio_data': result['audio_data'],
+        'state': result['state']
+    })
+
+@app.route('/play/<frequency>')
+def play_frequency(frequency):
+    try:
+        freq = float(frequency)
+        engine.play_frequency(freq)
+        return jsonify({'status': 'playing', 'frequency': freq})
+    except ValueError:
+        return jsonify({'status': 'error', 'message': 'Invalid frequency'})
+
+if __name__ == '__main__':
+    app.run(debug=True)
