@@ -1,4 +1,11 @@
-# Contributing to Sounds of Rangi
+"""
+PROPRIETARY TECHNOLOGY OF SOUNDSOFTRANGI TECHNOLOGIES Through Reality Protocol LLC
+Copyright (c) 2025 Reality Protocol LLC. All Rights Reserved.
+
+This software contains trade secrets and proprietary information owned by
+SoundsoftRangi Technologies. Use, disclosure, or reproduction is prohibited
+without prior written authorization.
+"""# Contributing to Sounds of Rangi
 
 We love your input! We want to make contributing to SoundsoftRangi as easy and transparent as possible.
 
