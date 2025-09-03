@@ -1,0 +1,21 @@
+flowchart TD
+    A[Raw Market Data] --> B[The Conductor<br/>G.O.L.A.M. Core]
+
+    B --> C[Harmonics Section<br/>Strings, Brass, Woodwinds]
+    C --> C1[Emotional Layer<br/>432Hz Soundscape]
+    C --> C2[Cymatic Patterns]
+
+    B --> D[Phonics Section<br/>Percussion, Vocals]
+    D --> D1[Symbolic Sounds<br/>Urgent Chimes, Alerts]
+    D --> D2[Narrative Voice<br/>Spoken Insights, Warnings]
+
+    B --> E[Logic Section<br/>Composer's Score]
+    E --> E1[Technical Analysis]
+    E --> E2[Pattern Recognition]
+    E --> E3[Predictive Models]
+
+    C1 --> F[User's Subconscious Mind<br/>Feels the market]
+    D2 --> G[User's Conscious Mind<br/>Understands the market]
+    E3 --> B
+
+    F & G --> H[The User<br/>Makes informed decisions<br/>with full situational awareness]
