@@ -1,0 +1,45 @@
+:root {
+    --primary-gold: #ffd700;
+    --harmonic-blue: #1a1a2e;
+    --rangi-purple: #16213e;
+    --frequency-white: #ffffff;
+    --success-green: #00ff88;
+    --error-red: #ff4444;
+    --warning-orange: #ffaa00;
+}
+
+.soundofrangi-theme {
+    background: linear-gradient(135deg, var(--harmonic-blue) 0%, var(--rangi-purple) 100%);
+    color: var(--frequency-white);
+    font-family: 'Courier New', monospace;
+}
+
+.navigation-panel {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.navigation-panel a {
+    color: var(--primary-gold);
+    text-decoration: none;
+    padding: 10px 15px;
+    border: 1px solid var(--primary-gold);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.navigation-panel a:hover {
+    background: var(--primary-gold);
+    color: var(--harmonic-blue);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .navigation-panel {
+        flex-direction: column;
+    }
+}
