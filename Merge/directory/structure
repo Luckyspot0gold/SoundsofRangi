@@ -1,0 +1,10 @@
+SoundofRangi/
+├── assets/
+│   ├── css/           # Shared stylesheets
+│   ├── js/            # Shared JavaScript libraries
+│   └── audio/         # Audio samples and presets
+├── harmonics/         # Frequency and sonic systems
+├── app/               # Trading interface
+├── reality_protocol/  # API and payment systems
+├── docs/              # Documentation
+└── tests/             # Automated testing suite
