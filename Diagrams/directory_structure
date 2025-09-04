@@ -1,0 +1,26 @@
+soundsofrangi/
+├── src/
+│   ├── orion-protocol/
+│   │   ├── visual-engine/
+│   │   ├── spectral-analysis/
+│   │   ├── synesthesia-mapping/
+│   │   └── resonance-chamber/
+│   ├── markets/
+│   │   ├── harmonic-correlation/
+│   │   └── real-time-feeds/
+│   ├── utils/
+│   │   ├── wavelength-calculator.js
+│   │   ├── frequency-color-mapper.js
+│   │   └── harmonic-decomposer.js
+│   ├── core/
+│   │   ├── physics-engine.js
+│   │   ├── harmonic-processor.js
+│   │   └── resonance-chamber.js
+│   └── index.js
+├── public/
+│   ├── index.html
+│   └── styles/
+│       └── main.css
+├── package.json
+├── webpack.config.js
+└── README.md
