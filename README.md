@@ -31,7 +31,7 @@ Contact: licensing@soundsoftrangi.com
 Website: www.soundsoftrangi.com (Coming Soon)
 # SoundsoftRangi - Harmonic Financial Sonification Platform
 
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
+![License](https://img.shields.io/badge/License-Custom-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.0%2B-blue)
 
