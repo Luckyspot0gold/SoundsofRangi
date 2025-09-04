@@ -1,0 +1,33 @@
+#!/bin/bash
+# SoundofRangi Merge Validation Script
+
+echo "🎵 SoundofRangi Merge Validation"
+echo "================================="
+
+# Check if files exist
+check_file() {
+    if [ -f "$1" ]; then
+        echo "✅ $1 found"
+    else
+        echo "❌ $1 missing"
+        exit 1
+    fi
+}
+
+echo "Checking required files..."
+check_file "Harmonics/enhanced-sonic-system.html"
+check_file "app/market-mayhem-orchestration.html"
+check_file "Reality_Protocol/elite-api-purchase.html"
+
+# Check for common JS errors
+echo "Checking for JavaScript syntax errors..."
+for file in $(find . -name "*.js"); do
+    if node -c "$file" >/dev/null 2>&1; then
+        echo "✅ $JS syntax OK"
+    else
+        echo "❌ $file has syntax errors"
+        exit 1
+    fi
+done
+
+echo "All checks passed! Ready to merge."
