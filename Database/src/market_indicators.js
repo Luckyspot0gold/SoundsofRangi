@@ -1,4 +1,39 @@
-// src/components/MarketIndicators.js
+// Add to existing JavaScript
+let dataSource = 'simulated';
+
+// Modified updateMarketData function
+async function updateMarketData() {
+  if (dataSource === 'live') {
+    const liveData = await fetchMarketData();
+    if (liveData) {
+      marketData = liveData;
+    } else {
+      // Fallback to simulated data if API fails
+      console.log('Using simulated data due to API failure');
+      updateSimulatedMarketData();
+    }
+  } else {
+    updateSimulatedMarketData();
+  }
+  
+  // Update UI as before
+  // ...
+}
+
+function updateSimulatedMarketData() {
+  // Existing simulation logic
+  marketData.btc.change += (Math.random() - 0.5) * 0.5;
+  // ... rest of simulation
+}
+
+// Modified init function
+function init() {
+  initializeCanvases();
+  document.getElementById('dataSource').addEventListener('change', (e) => {
+    dataSource = e.target.value;
+  });
+  animate();
+}// src/components/MarketIndicators.js
 import React from 'react';
 
 const MarketIndicators = ({ data }) => {
