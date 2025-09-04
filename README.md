@@ -56,8 +56,8 @@ A revolutionary platform that transforms financial market data into harmonic aud
 
 ```bash
 # Clone repository
-git clone https://github.com/SoundsoftRangi/SoundsoftRangi.git
-cd SoundsoftRangi
+git clone https://github.com/SoundsofRangi/SoundsofRangi.git
+cd SoundsofRangi
 
 # Install Python dependencies
 pip install -r requirements.txt
