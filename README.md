@@ -4,7 +4,7 @@
 # SoundsoftRangi - Harmonic Financial Sonification Platform
 ## PROPRIETARY TECHNOLOGY - ALL RIGHTS RESERVED
 
-**Copyright © 2025 SoundsoftRangi Technologies. All Rights Reserved.**
+**Copyright © 2025 SoundsofRangi Technologies. All Rights Reserved.**
 
 This technology is protected under:
 - Trade Secret Protection
