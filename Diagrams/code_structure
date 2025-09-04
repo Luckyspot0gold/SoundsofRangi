@@ -1,0 +1,9 @@
+// Current: All code in single file
+// Suggested: Modular architecture
+
+// Example module structure:
+// - main.js (entry point)
+// - marketDataService.js (data handling)
+// - visualizationEngine.js (canvas rendering)
+// - audioController.js (Web Audio API)
+// - ledgerService.js (data persistence simulation)
