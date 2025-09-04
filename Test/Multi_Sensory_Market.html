@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoundofRangi | Multi-Sensory Market Sonification</title>
+    <style>
+        :root {
+            --primary-gold: #ffd700;
+            --harmonic-blue: #0a0a0a;
+            --rangi-purple: #1a1a2e;
+            --frequency-white: #ffffff;
+            --success-green: #00ff88;
+            --error-red: #ff4444;
+            --warning-orange: #ffaa00;
+            --cymatic-teal: #00bcd4;
+            --haptic-amber: #ff6b35;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--harmonic-blue) 0%, var(--rangi-purple) 50%, #16213e 100%);
+            color: var(--frequency-white);
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.8em;
+            background: linear-gradient(45deg, var(--primary-gold), var(--haptic-amber), var(--cymatic-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            color: #cccccc;
+            margin-bottom: 15px;
+        }
+
+        .creator {
+            color: var(--primary-gold);
+            font-style: italic;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .panel h2 {
+            color: var(--primary-gold);
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .market-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .market-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .market-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .market-card h3 {
+            color: var(--primary-gold);
+            margin-bottom: 10px;
+        }
+
+        .market-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .market-change {
+            font-size: 0.9em;
+            padding: 3px 8px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .positive { 
+            background: rgba(0, 255, 136, 0.2); 
+            color: var(--success-green);
+        }
+        
+        .negative { 
+            background: rgba(255, 68, 68, 0.2); 
+            color: var(--error-red);
+        }
+
+        canvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .control-group {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-gold);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            border-radius: 5px;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .value-display {
+            color: var(--primary-gold);
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(45deg, var(--primary-gold), var(--haptic-amber));
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .sensory-indicators {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .indicator {
+            text-align: center;
+        }
+
+        .indicator-label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary-gold);
+        }
+
+        .indicator-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .audio { color: var(--cymatic-teal); }
+        .haptic { color: var(--haptic-amber); }
+        .visual { color: var(--primary-gold); }
+
+        .harmonic-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+
+        .status-bar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .ledger {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .ledger-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid var(--primary-gold);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation for sensory feedback */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SoundofRangi</h1>
+            <p class="tagline">Multi-Sensory Market Data Sonification Platform</p>
+            <p class="creator">Envisioned by Justin William McCrea</p>
+            <p>Real-Time Asset Data → Harmonic Sonification + Haptic Stimulation + Cymatic Visualization</p>
+        </header>
+
+        <div class="market-cards">
+            <div class="market-card">
+                <h3>Bitcoin (BTC)</h3>
+                <div class="market-value" id="btc-price">$45,234.56</div>
+                <div class="market-change positive" id="btc-change">+2.34%</div>
+            </div>
+            <div class="market-card">
+                <h3>Ethereum (ETH)</h3>
+                <div class="market-value" id="eth-price">$2,845.67</div>
+                <div class="market-change positive" id="eth-change">+1.89%</div>
+            </div>
+            <div class="market-card">
+                <h3>Solana (SOL)</h3>
+                <div class="market-value" id="sol-price">$98.45</div>
+                <div class="market-change negative" id="sol-change">-0.67%</div>
+            </div>
+            <div class="market-card">
+                <h3>Base Frequency</h3>
+                <div class="market-value" id="base-freq">432.00 Hz</div>
+                <div class="market-change" id="harmonic-quality">Harmonic Purity: 94.2%</div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="panel">
+                <h2>Sonification Waveform</h2>
+                <canvas id="waveformCanvas"></canvas>
+                <div class="value-display" id="currentFreq">442.8 Hz</div>
+                <div class="harmonic-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffd700;"></div>
+                        <span>Fundamental Frequency</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff6b35;"></div>
+                        <span>Harmonic Overtones</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Cymatic Visualization</h2>
+                <canvas id="cymaticCanvas"></canvas>
+                <div class="sensory-indicators">
+                    <div class="indicator">
+                        <span class="indicator-label">Audio Intensity</span>
+                        <span class="indicator-value audio" id="audio-intensity">78%</span>
+                    </div>
+                    <div class="indicator">
+                        <span class="indicator-label">Haptic Feedback</span>
+                        <span class="indicator-value haptic" id="haptic-intensity">65%</span>
+                    </div>
+                    <div class="indicator">
+                        <span class="indicator-label">Visual Resonance</span>
+                        <span class="indicator-value visual" id="visual-intensity">82%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Frequency Spectrum</h2>
+                <canvas id="spectrumCanvas"></canvas>
+                <div class="value-display" id="harmonic-series">Fundamental: 432Hz · 2nd: 864Hz · 3rd: 1296Hz</div>
+            </div>
+
+            <div class="panel">
+                <h2>Haptic Feedback Control</h2>
+                <canvas id="hapticCanvas"></canvas>
+                <div class="value-display" id="haptic-status">Haptic Simulation Active</div>
+                <div class="button-group">
+                    <button onclick="activateHaptics()">Activate Haptics</button>
+                    <button onclick="calibrateHaptics()">Calibrate</button>
+                </div>
+            </div>
+
+            <div class="panel full-width">
+                <h2>Sensory Integration Dashboard</h2>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="sonification-intensity">Sonification Intensity</label>
+                        <input type="range" id="sonification-intensity" min="0" max="100" value="75">
+                        <div class="value-display" id="sonification-value">75%</div>
+                    </div>
+                    <div class="control-group">
+                        <label for="haptic-strength">Haptic Strength</label>
+                        <input type="range" id="haptic-strength" min="0" max="100" value="60">
+                        <div class="value-display" id="haptic-value">60%</div>
+                    </div>
+                    <div class="control-group">
+                        <label for="visual-complexity">Visual Complexity</label>
+                        <input type="range" id="visual-complexity" min="1" max="10" value="5">
+                        <div class="value-display" id="visual-value">5</div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button onclick="toggleAudio()">🔊 Toggle Audio</button>
+                    <button onclick="resetSystem()">🔄 Reset System</button>
+                    <button onclick="exportData()">💾 Export Data</button>
+                </div>
+                <div class="status-bar" id="system-status">
+                    System Status: All sensors active | Harmonic alignment: 94.2%
+                </div>
+            </div>
+
+            <div class="panel full-width">
+                <h2>Sensory Event Ledger</h2>
+                <div class="ledger" id="sensory-ledger">
+                    <div class="ledger-entry">[12:45:32] AUDIO: Frequency shift to 442.8Hz | BTC +2.34%</div>
+                    <div class="ledger-entry">[12:45:28] HAPTIC: Pulse pattern updated | Intensity 65%</div>
+                    <div class="ledger-entry">[12:45:25] VISUAL: Cymatic pattern complexity increased</div>
+                    <div class="ledger-entry">[12:45:20] SYSTEM: All sensors synchronized</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let audioContext;
+        let oscillators = [];
+        let isAudioEnabled = false;
+        let animationId;
+        let currentTime = 0;
+        let marketData = {
+            btc: { price: 45234.56, change: 2.34 },
+            eth: { price: 2845.67, change: 1.89 },
+            sol: { price: 98.45, change: -0.67 }
+        };
+
+        // Canvas contexts
+        const waveformCanvas = document.getElementById('waveformCanvas');
+        const cymaticCanvas = document.getElementById('cymaticCanvas');
+        const spectrumCanvas = document.getElementById('spectrumCanvas');
+        const hapticCanvas = document.getElementById('hapticCanvas');
+
+        const waveCtx = waveformCanvas.getContext('2d');
+        const cymaticCtx = cymaticCanvas.getContext('2d');
+        const specCtx = spectrumCanvas.getContext('2d');
+        const hapticCtx = hapticCanvas.getContext('2d');
+
+        // Initialize canvases
+        function initializeCanvases() {
+            const canvases = [waveformCanvas, cymaticCanvas, spectrumCanvas, hapticCanvas];
+            canvases.forEach(canvas => {
+                canvas.width = canvas.offsetWidth * 2;
+                canvas.height = canvas.offsetHeight * 2;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(2, 2);
+            });
+        }
+
+        // Calculate harmonic frequency from market data
+        function calculateHarmonicFrequency(baseFreq, marketChange) {
+            return baseFreq * (1 + marketChange / 100);
+        }
+
+        // Generate harmonic series
+        function generateHarmonicSeries(fundamental, complexity) {
+            const harmonics = [];
+            for (let i = 1; i <= complexity; i++) {
+                harmonics.push({
+                    frequency: fundamental * i,
+                    amplitude: 1 / Math.sqrt(i),
+                    phase: 0
+                });
+            }
+            return harmonics;
+        }
+
+        // Draw real-time waveform with enhanced sonification
+        function drawWaveform() {
+            const canvas = waveformCanvas;
+            const ctx = waveCtx;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate current frequency based on market data
+            const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+            const currentFreq = calculateHarmonicFrequency(432, avgChange);
+
+            // Update frequency display
+            document.getElementById('currentFreq').textContent = `${currentFreq.toFixed(1)} Hz`;
+
+            // Generate harmonic series
+            const complexity = parseInt(document.getElementById('visual-complexity').value);
+            const harmonics = generateHarmonicSeries(currentFreq, complexity);
+
+            // Draw composite waveform
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            const samples = width * 2;
+            const timeScale = 0.01;
+
+            for (let x = 0; x < width; x++) {
+                let y = 0;
+
+                // Sum all harmonics
+                harmonics.forEach((harmonic, index) => {
+                    const phase = (x * timeScale + currentTime) * harmonic.frequency * 0.001;
+                    const amplitude = harmonic.amplitude * (height / 4);
+                    y += Math.sin(phase * Math.PI * 2) * amplitude;
+                });
+
+                y = height / 2 + y;
+
+                if (x === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+
+            // Draw individual harmonics (faded)
+            harmonics.forEach((harmonic, index) => {
+                if (index > 0) {
+                    ctx.strokeStyle = `rgba(255, 107, 53, ${0.3 / index})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+
+                    for (let x = 0; x < width; x++) {
+                        const phase = (x * timeScale + currentTime) * harmonic.frequency * 0.001;
+                        const amplitude = harmonic.amplitude * (height / 6);
+                        const y = height / 2 + Math.sin(phase * Math.PI * 2) * amplitude;
+
+                        if (x === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+
+                    ctx.stroke();
+                }
+            });
+
+            // Draw center line
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(width, height / 2);
+            ctx.stroke();
+        }
+
+        // Draw cymatic visualization
+        function drawCymatic() {
+            const canvas = cymaticCanvas;
+            const ctx = cymaticCtx;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxRadius = Math.min(width, height) / 2.5;
+
+            // Calculate market energy
+            const marketEnergy = (Math.abs(marketData.btc.change) + 
+                                 Math.abs(marketData.eth.change) + 
+                                 Math.abs(marketData.sol.change)) / 3;
+
+            // Draw cymatic patterns based on market energy
+            const complexity = parseInt(document.getElementById('visual-complexity').value);
+            
+            for (let i = 0; i < complexity * 5; i++) {
+                const radius = (maxRadius / (complexity * 5)) * i;
+                const angle = (currentTime * 0.001) + (i * 0.2);
+                const displacement = Math.sin(angle) * marketEnergy;
+                
+                ctx.beginPath();
+                ctx.arc(
+                    centerX + Math.cos(angle) * displacement,
+                    centerY + Math.sin(angle) * displacement,
+                    radius * 0.8,
+                    0,
+                    Math.PI * 2
+                );
+                
+                // Color based on market performance
+                const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+                const hue = avgChange > 0 ? 60 : 360; // Gold for positive, red for negative
+                
+                ctx.strokeStyle = `hsla(${hue}, 70%, 50%, ${0.5 - (i / (complexity * 10))})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            // Update sensory indicators
+            document.getElementById('audio-intensity').textContent = `${Math.min(100, Math.round(marketEnergy * 15))}%`;
+            document.getElementById('haptic-intensity').textContent = `${Math.min(100, Math.round(marketEnergy * 12))}%`;
+            document.getElementById('visual-intensity').textContent = `${Math.min(100, Math.round(complexity * 10))}%`;
+        }
+
+        // Draw frequency spectrum
+        function drawSpectrum() {
+            const canvas = spectrumCanvas;
+            const ctx = specCtx;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate current harmonics
+            const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+            const currentFreq = calculateHarmonicFrequency(432, avgChange);
+            const complexity = parseInt(document.getElementById('visual-complexity').value);
+            const harmonics = generateHarmonicSeries(currentFreq, complexity);
+
+            // Draw frequency bars
+            const barWidth = width / harmonics.length;
+
+            harmonics.forEach((harmonic, index) => {
+                const x = index * barWidth;
+                const barHeight = harmonic.amplitude * height * 0.8;
+                const y = height - barHeight;
+
+                // Color gradient based on frequency
+                const hue = (harmonic.frequency - 200) / 1000 * 360;
+                ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+
+                ctx.fillRect(x + 2, y, barWidth - 4, barHeight);
+
+                // Draw frequency label for significant harmonics
+                if (index < 5) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '10px Courier New';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`${harmonic.frequency.toFixed(0)}Hz`, x + barWidth/2, height - 5);
+                }
+            });
+
+            // Update harmonic series display
+            const harmonicSeriesText = harmonics.slice(0, 3)
+                .map((h, i) => `${i+1}${getOrdinal(i+1)}: ${h.frequency.toFixed(0)}Hz`)
+                .join(' · ');
+            document.getElementById('harmonic-series').textContent = harmonicSeriesText;
+        }
+
+        // Helper function for ordinal numbers
+        function getOrdinal(n) {
+            const s = ["th", "st", "nd", "rd"];
+            const v = n % 100;
+            return s[(v - 20) % 10] || s[v] || s[0];
+        }
+
+        // Draw haptic feedback visualization
+        function drawHaptic() {
+            const canvas = hapticCanvas;
+            const ctx = hapticCtx;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate market volatility for haptic intensity
+            const volatility = (Math.abs(marketData.btc.change) + 
+                               Math.abs(marketData.eth.change) + 
+                               Math.abs(marketData.sol.change)) / 3;
+            
+            const hapticStrength = parseInt(document.getElementById('haptic-strength').value);
+            const intensity = (volatility * hapticStrength) / 100;
+
+            // Draw haptic pulse visualization
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxRadius = Math.min(width, height) / 3;
+
+            for (let i = 0; i < 5; i++) {
+                const pulsePhase = (currentTime * 0.005) + (i * 0.5);
+                const radius = (maxRadius * 0.5) + (Math.sin(pulsePhase) * maxRadius * 0.4 * intensity);
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                
+                // Color based on intensity
+                const hue = 35; // Amber color for haptics
+                const alpha = 0.7 - (i * 0.15);
+                ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${alpha})`;
+                ctx.lineWidth = 2 + (i * 0.5);
+                ctx.stroke();
+            }
+
+            // Draw intensity indicator
+            ctx.fillStyle = '#ff6b35';
+            ctx.font = '14px Courier New';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Haptic Intensity: ${Math.round(intensity * 100)}%`, width / 2, height - 10);
+        }
+
+        // Update market data (simulated)
+        function updateMarketData() {
+            // Simulate market changes
+            marketData.btc.change += (Math.random() - 0.5) * 0.5;
+            marketData.eth.change += (Math.random() - 0.5) * 0.4;
+            marketData.sol.change += (Math.random() - 0.5) * 0.6;
+
+            // Keep changes within reasonable bounds
+            marketData.btc.change = Math.max(-10, Math.min(10, marketData.btc.change));
+            marketData.eth.change = Math.max(-10, Math.min(10, marketData.eth.change));
+            marketData.sol.change = Math.max(-10, Math.min(10, marketData.sol.change));
+
+            // Update prices
+            marketData.btc.price *= (1 + marketData.btc.change / 10000);
+            marketData.eth.price *= (1 + marketData.eth.change / 10000);
+            marketData.sol.price *= (1 + marketData.sol.change / 10000);
+
+            // Update display
+            document.getElementById('btc-price').textContent = `$${marketData.btc.price.toFixed(2)}`;
+            document.getElementById('eth-price').textContent = `$${marketData.eth.price.toFixed(2)}`;
+            document.getElementById('sol-price').textContent = `$${marketData.sol.price.toFixed(2)}`;
+
+            document.getElementById('btc-change').textContent = `${marketData.btc.change >= 0 ? '+' : ''}${marketData.btc.change.toFixed(2)}%`;
+            document.getElementById('eth-change').textContent = `${marketData.eth.change >= 0 ? '+' : ''}${marketData.eth.change.toFixed(2)}%`;
+            document.getElementById('sol-change').textContent = `${marketData.sol.change >= 0 ? '+' : ''}${marketData.sol.change.toFixed(2)}%`;
+
+            // Update change colors
+            document.getElementById('btc-change').className = `market-change ${marketData.btc.change >= 0 ? 'positive' : 'negative'}`;
+            document.getElementById('eth-change').className = `market-change ${marketData.eth.change >= 0 ? 'positive' : 'negative'}`;
+            document.getElementById('sol-change').className = `market-change ${marketData.sol.change >= 0 ? 'positive' : 'negative'}`;
+
+            // Update harmonic quality display
+            const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+            const harmonicQuality = Math.max(0, Math.min(100, 50 + avgChange * 10));
+            document.getElementById('harmonic-quality').textContent = `Harmonic Purity: ${harmonicQuality.toFixed(1)}%`;
+        }
+
+        // Add sensory event to ledger
+        function addSensoryEvent(message) {
+            const ledger = document.getElementById('sensory-ledger');
+            const now = new Date();
+            const timestamp = `[${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}]`;
+            
+            const entry = document.createElement('div');
+            entry.className = 'ledger-entry';
+            entry.textContent = `${timestamp} ${message}`;
+
+            ledger.insertBefore(entry, ledger.firstChild);
+
+            // Keep only last 10 entries
+            while (ledger.children.length > 10) {
+                ledger.removeChild(ledger.lastChild);
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            currentTime += 16; // ~60fps
+
+            updateMarketData();
+            drawWaveform();
+            drawCymatic();
+            drawSpectrum();
+            drawHaptic();
+
+            // Add sensory event every few seconds
+            if (currentTime % 5000 < 16) {
+                const events = [
+                    `AUDIO: Frequency shift to ${calculateHarmonicFrequency(432, marketData.btc.change).toFixed(1)}Hz | BTC ${marketData.btc.change >= 0 ? '+' : ''}${marketData.btc.change.toFixed(2)}%`,
+                    `HAPTIC: Pulse pattern updated | Intensity ${Math.round((Math.abs(marketData.btc.change) * parseInt(document.getElementById('haptic-strength').value)) / 100)}%`,
+                    `VISUAL: Cymatic pattern complexity ${document.getElementById('visual-complexity').value}`,
+                    `SYSTEM: Harmonic alignment ${Math.max(0, Math.min(100, 50 + marketData.btc.change * 10)).toFixed(1)}%`
+                ];
+                addSensoryEvent(events[Math.floor(Math.random() * events.length)]);
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Control functions
+        function toggleAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (isAudioEnabled) {
+                // Stop audio
+                oscillators.forEach(osc => osc.stop());
+                oscillators = [];
+                isAudioEnabled = false;
+                addSensoryEvent("AUDIO: Sonification disabled");
+            } else {
+                // Start audio
+                const avgChange = (marketData.btc.change + marketData.eth.change + marketData.sol.change) / 3;
+                const currentFreq = calculateHarmonicFrequency(432, avgChange);
+                const complexity = parseInt(document.getElementById('visual-complexity').value);
+                const harmonics = generateHarmonicSeries(currentFreq, complexity);
+
+                harmonics.forEach(harmonic => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(harmonic.frequency, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(harmonic.amplitude * 0.1, audioContext.currentTime);
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.start();
+                    oscillators.push(oscillator);
+                });
+
+                isAudioEnabled = true;
+                addSensoryEvent("AUDIO: Sonification enabled");
+            }
+        }
+
+        function activateHaptics() {
+            // Simulate haptic feedback activation
+            addSensoryEvent("HAPTIC: Feedback system activated");
+            document.getElementById('haptic-status').textContent = "Haptic Simulation Active";
+            
+            // In a real implementation, this would interface with haptic hardware
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+        }
+
+        function calibrateHaptics() {
+            addSensoryEvent("SYSTEM: Calibrating sensory outputs");
+            
+            // Simulate calibration process
+            document.getElementById('haptic-status').textContent = "Calibrating...";
+            setTimeout(() => {
+                document.getElementById('haptic-status').textContent = "Calibration Complete";
+                addSensoryEvent("SYSTEM: Calibration complete");
+            }, 1500);
+        }
+
+        function resetSystem() {
+            marketData = {
+                btc: { price: 45234.56, change: 2.34 },
+                eth: { price: 2845.67, change: 1.89 },
+                sol: { price: 98.45, change: -0.67 }
+            };
+            currentTime = 0;
+            document.getElementById('sensory-ledger').innerHTML = '';
+            addSensoryEvent("SYSTEM: Full system reset");
+        }
+
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                marketData: marketData,
+                sensorySettings: {
+                    sonificationIntensity: document.getElementById('sonification-intensity').value,
+                    hapticStrength: document.getElementById('haptic-strength').value,
+                    visualComplexity: document.getElementById('visual-complexity').value
+                },
+                ledgerEntries: Array.from(document.getElementById('sensory-ledger').children).map(entry => entry.textContent)
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `soundofrangi-data-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            addSensoryEvent("DATA: Export completed");
+        }
+
+        // Control event listeners
+        document.getElementById('sonification-intensity').addEventListener('input', (e) => {
+            document.getElementById('sonification-value').textContent = `${e.target.value}%`;
+        });
+
+        document.getElementById('haptic-strength').addEventListener('input', (e) => {
+            document.getElementById('haptic-value').textContent = `${e.target.value}%`;
+        });
+
+        document.getElementById('visual-complexity').addEventListener('input', (e) => {
+            document.getElementById('visual-value').textContent = e.target.value;
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            initializeCanvases();
+            animate();
+            addSensoryEvent("SYSTEM: SoundofRangi initialized");
+        });
+
+        window.addEventListener('resize', () => {
+            initializeCanvases();
+        });
+    </script>
+</body>
+</html>
