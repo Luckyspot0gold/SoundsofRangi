@@ -1,8 +1,8 @@
-// PROPRIETARY TECHNOLOGY OF REALITY PROTOCOL LLC
-// PATENT PENDING: MARKET-DRIVEN WAVELENGTH VISUALIZATION SYSTEM
-// © 2025 Reality Protocol LLC. All Rights Reserved.
-# SoundsoftRangi - Harmonic Financial Sonification Platform
-## PROPRIETARY TECHNOLOGY - ALL RIGHTS RESERVED
+        // PROPRIETARY TECHNOLOGY OF REALITY PROTOCOL LLC
+        // PATENT PENDING: MARKET-DRIVEN WAVELENGTH VISUALIZATION SYSTEM
+        // © 2025 Reality Protocol LLC. All Rights Reserved.
+        # SoundsoftRangi - Harmonic Financial Sonification Platform
+        ## PROPRIETARY TECHNOLOGY - ALL RIGHTS RESERVED
 
 **Copyright © 2025 SoundsofRangi Technologies. All Rights Reserved.**
 
