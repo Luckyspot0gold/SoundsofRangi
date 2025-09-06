@@ -8,4 +8,14 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
+      interval: "weekly"version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/" 
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
       interval: "weekly"
