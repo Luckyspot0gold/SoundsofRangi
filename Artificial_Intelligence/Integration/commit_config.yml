@@ -1,0 +1,7 @@
+- name: Generate SBOM
+  run: syft packages dir -o cyclonedx-json > sbom.json
+
+- name: Scan container image
+  uses: aquasecurity/trivy-action@v0.3.0
+  with:
+    image: my-app:${{ github.sha }}
