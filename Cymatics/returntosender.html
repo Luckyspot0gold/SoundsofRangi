@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoundsofRangi - Real-Time Quantum Cymatics System</title>
+    <meta name="description" content="Live BTC $110,559 - Quantum-enhanced harmonic trading with real cymatics">
+    <style>
+        :root {
+            --primary: #0a0e17;
+            --secondary: #131b2e;
+            --accent: #00d8ff;
+            --accent-dark: #0084a3;
+            --text: #e0f7ff;
+            --text-dim: #8ca0b4;
+            --success: #00ff9d;
+            --warning: #ffcc00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .screen-fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0, 216, 255, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0, 216, 255, 0.2);
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo::before {
+            content: "♪";
+            margin-right: 10px;
+            font-size: 32px;
+        }
+        
+        .btc-price {
+            background: rgba(0, 216, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            border: 1px solid var(--accent-dark);
+            box-shadow: 0 0 15px rgba(0, 216, 255, 0.2);
+        }
+        
+        .price-label {
+            color: var(--text-dim);
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        
+        .price-value {
+            color: var(--accent);
+            font-size: 18px;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+        
+        .visualization-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin: 40px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 30px rgba(0, 216, 255, 0.2);
+            border: 1px solid var(--accent-dark);
+        }
+        
+        #cymatics-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .control-btn {
+            background: rgba(0, 216, 255, 0.1);
+            color: var(--text);
+            border: 1px solid var(--accent-dark);
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .control-btn:hover {
+            background: rgba(0, 216, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 216, 255, 0.2);
+        }
+        
+        .control-btn.active {
+            background: var(--accent);
+            color: var(--primary);
+        }
+        
+        .deposit-section {
+            background: rgba(19, 27, 46, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 50px 0;
+            border: 1px solid var(--accent-dark);
+            box-shadow: 0 0 30px rgba(0, 216, 255, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: "⇓";
+            margin-right: 10px;
+            color: var(--success);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--accent-dark);
+            color: var(--text);
+            font-size: 16px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 216, 255, 0.3);
+        }
+        
+        .amount-input {
+            position: relative;
+        }
+        
+        .amount-input::after {
+            content: "BTC";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(90deg, var(--accent) 0%, var(--success) 100%);
+            color: var(--primary);
+            border: none;
+            padding: 16px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 216, 255, 0.4);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 60px 0;
+        }
+        
+        .info-card {
+            background: rgba(19, 27, 46, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--accent-dark);
+            transition: all 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 216, 255, 0.2);
+        }
+        
+        .info-card h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .info-card p {
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 60px;
+            border-top: 1px solid rgba(0, 216, 255, 0.2);
+            color: var(--text-dim);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .visualization-container {
+                height: 300px;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-fade-overlay" id="screenFadeOverlay"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">SoundsofRangi</div>
+            <div class="btc-price">
+                <span class="price-label">BTC:</span>
+                <span class="price-value" id="btcPrice">$110,559</span>
+            </div>
+        </header>
+        
+        <section class="hero">
+            <h1>Quantum-Enhanced Harmonic Trading</h1>
+            <p class="subtitle">Experience the future of financial analysis with real-time quantum cymatics visualization and predictive harmonic patterns</p>
+            
+            <div class="visualization-container">
+                <canvas id="cymatics-canvas"></canvas>
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn active" data-freq="432">432 Hz</button>
+                <button class="control-btn" data-freq="528">528 Hz</button>
+                <button class="control-btn" data-freq="639">639 Hz</button>
+                <button class="control-btn" data-freq="852">852 Hz</button>
+                <button class="control-btn" data-freq="963">963 Hz</button>
+            </div>
+        </section>
+        
+        <section class="deposit-section">
+            <h2 class="section-title">Complete Your Deposit Submission</h2>
+            <form id="depositForm">
+                <div class="form-group">
+                    <label for="walletAddress">Wallet Address</label>
+                    <input type="text" id="walletAddress" placeholder="Enter your BTC wallet address" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="depositAmount">Deposit Amount</label>
+                    <div class="amount-input">
+                        <input type="number" id="depositAmount" step="0.001" min="0.001" placeholder="0.00" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="investmentStrategy">Investment Strategy</label>
+                    <select id="investmentStrategy" required>
+                        <option value="">Select a strategy</option>
+                        <option value="quantum">Quantum Harmonic Scaling</option>
+                        <option value="neural">Neural Frequency Analysis</option>
+                        <option value="resonance">Resonance Trading</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="submit-btn">Initiate Quantum Transfer</button>
+            </form>
+        </section>
+        
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>Quantum Cymatics</h3>
+                <p>Our system translates market data into harmonic frequencies, creating visible patterns that reveal underlying market structures and predictive formations.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3>Harmonic Trading</h3>
+                <p>By applying principles of quantum physics to financial markets, we identify patterns that traditional analysis methods cannot detect.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3>Secure Transactions</h3>
+                <p>All deposits are protected with quantum-resistant encryption and multi-signature wallet technology for maximum security.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>SoundsofRangi © 2023 | Quantum Financial Systems</p>
+    </footer>
+
+    <script>
+        // BTC Price Update Simulation
+        function updateBtcPrice() {
+            const currentPrice = 110559;
+            // Simulate small price fluctuations
+            const change = (Math.random() - 0.5) * 2000;
+            const newPrice = currentPrice + change;
+            
+            document.getElementById('btcPrice').textContent = `$${newPrice.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+            
+            // Schedule next update
+            setTimeout(updateBtcPrice, 5000 + Math.random() * 5000);
+        }
+        
+        // Initialize price updates
+        updateBtcPrice();
+        
+        // Cymatics Visualization
+        const canvas = document.getElementById('cymatics-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // Cymatics variables
+        let particles = [];
+        let frequency = 432;
+        const maxParticles = 2000;
+        
+        // Initialize particles
+        function initParticles() {
+            particles = [];
+            
+            for (let i = 0; i < maxParticles; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    color: `hsl(${Math.random() * 60 + 180}, 100%, ${Math.random() * 30 + 60}%)`,
+                    vx: 0,
+                    vy: 0,
+                    angle: 0,
+                    speed: 0.01 + Math.random() * 0.05
+                });
+            }
+        }
+        
+        // Draw cymatics pattern
+        function drawCymatics() {
+            // Clear canvas with transparent background for trailing effect
+            ctx.fillStyle = 'rgba(10, 14, 23, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Draw each particle
+            particles.forEach(p => {
+                // Update particle position based on frequency
+                p.angle += p.speed;
+                
+                // Calculate distance from center
+                const dx = p.x - centerX;
+                const dy = p.y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Create circular wave pattern based on frequency
+                const wave = Math.sin(distance * 0.02 - Date.now() * 0.001 * (frequency/432));
+                
+                p.x += Math.cos(p.angle) * wave * 0.5;
+                p.y += Math.sin(p.angle) * wave * 0.5;
+                
+                // Wrap around edges
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                
+                // Draw particle
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+            
+            requestAnimationFrame(drawCymatics);
+        }
+        
+        // Frequency control buttons
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelector('.control-btn.active').classList.remove('active');
+                this.classList.add('active');
+                frequency = parseInt(this.dataset.freq);
+            });
+        });
+        
+        // Form submission
+        document.getElementById('depositForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Form validation
+            const walletAddress = document.getElementById('walletAddress').value;
+            const amount = document.getElementById('depositAmount').value;
+            const strategy = document.getElementById('investmentStrategy').value;
+            
+            if (!walletAddress || !amount || !strategy) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            // Simulate quantum transfer process
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.textContent = 'Quantum Entangling...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                submitBtn.textContent = 'Transfer Complete!';
+                submitBtn.style.background = 'linear-gradient(90deg, var(--success) 0%, var(--accent-dark) 100%)';
+                
+                // Reset form after success
+                setTimeout(() => {
+                    document.getElementById('depositForm').reset();
+                    submitBtn.textContent = 'Initiate Quantum Transfer';
+                    submitBtn.disabled = false;
+                    submitBtn.style.background = 'linear-gradient(90deg, var(--accent) 0%, var(--success) 100%)';
+                }, 2000);
+            }, 3000);
+        });
+        
+        // Initialize and start visualization
+        initParticles();
+        drawCymatics();
+    </script>
+</body>
+</html>
