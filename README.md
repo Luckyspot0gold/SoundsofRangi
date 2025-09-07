@@ -1,8 +1,8 @@
-        // PROPRIETARY TECHNOLOGY OF REALITY PROTOCOL LLC
-        // PATENT PENDING: MARKET-DRIVEN WAVELENGTH VISUALIZATION SYSTEM
-        // © 2025 Reality Protocol LLC. All Rights Reserved.
-        # SoundsofRangi - Harmonic Financial Sonification Platform
-        ## PROPRIETARY TECHNOLOGY - ALL RIGHTS RESERVED
+                   PROPRIETARY TECHNOLOGY OF REALITY PROTOCOL LLC
+             PATENT PENDING: MARKET-DRIVEN WAVELENGTH VISUALIZATION SYSTEM
+                © 2025 Reality Protocol LLC. All Rights Reserved.
+             SoundsofRangi - Harmonic Financial Sonification Platform
+                   PROPRIETARY TECHNOLOGY - ALL RIGHTS RESERVED
 
 **Copyright © 2025 SoundsofRangi Reality Protocol LLC. All Rights Reserved.**
 
@@ -31,10 +31,12 @@ Contact: licensing@RealityProtocol.io
 Website: www.soundsofrangi.com (Coming Soon)
 # SoundsofRangi - Harmonic Financial Sonification Platform
 
-XION_Blaze-Logo-White-On-Black-Circle.png
+
 ![License](https://img.shields.io/badge/License-Custom-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.0%2B-blue)
+
+XION-Blaze-Logo-White-On-Black-Circle.png
 
 A revolutionary platform that transforms financial market data into harmonic audio experiences using advanced cymatic principles and sonification techniques.
 
