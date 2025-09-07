@@ -31,7 +31,7 @@ Contact: licensing@RealityProtocol.io
 Website: www.soundsofrangi.com (Coming Soon)
 # SoundsofRangi - Harmonic Financial Sonification Platform
 
-![XION]-Blaze-Logo-White-On-Black-Circle.png
+![XION]_(Blaze-Logo-White-On-Black-Circle.png.).
 ![License](https://img.shields.io/badge/License-Custom-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.0%2B-blue)
