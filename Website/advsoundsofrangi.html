@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SoundsofRangi - Real-Time Quantum Cymatics System</title>
+  <meta name="description" content="Live BTC value - harmonic haptic trading with cymatics demo" />
+  <!-- Note: For production, serve a strict CSP header from your server. This demo uses inline CSS for convenience. -->
+  <style>
+    :root{
+      --primary:#0a0e17;--secondary:#131b2e;--accent:#00d8ff;--accent-dark:#0084a3;
+      --text:#e0f7ff;--text-dim:#8ca0b4;--success:#00ff9d;--warning:#ffcc00;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI, system-ui, -apple-system, "Helvetica Neue", Arial;}
+    body{background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--text);min-height:100vh;}
+    .container{max-width:1200px;margin:0 auto;padding:20px;}
+    header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid rgba(0,216,255,0.08)}
+    .logo{font-size:28px;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--success));-webkit-background-clip:text;color:transparent;display:flex;align-items:center}
+    .logo::before{content:"♪";margin-right:10px;font-size:32px}
+    .btc-price{background:rgba(0,216,255,0.06);padding:10px 16px;border-radius:30px;border:1px solid var(--accent-dark)}
+    .price-label{color:var(--text-dim);font-size:14px;margin-right:8px}
+    .price-value{color:var(--accent);font-size:18px;font-weight:700}
+    .hero{text-align:center;padding:48px 0}
+    h1{font-size:3rem;margin-bottom:12px;background:linear-gradient(90deg,var(--accent),var(--success));-webkit-background-clip:text;color:transparent}
+    .subtitle{color:var(--text-dim);max-width:760px;margin:0 auto 28px;line-height:1.6}
+    .visualization-container{position:relative;width:100%;height:420px;margin:30px auto;border-radius:10px;overflow:hidden;background:rgba(0,0,0,0.28);border:1px solid rgba(0,216,255,0.06)}
+    #cymatics-canvas{display:block;width:100%;height:100%}
+    .controls{display:flex;justify-content:center;gap:12px;margin:18px 0;flex-wrap:wrap}
+    .control-btn{background:rgba(0,216,255,0.06);color:var(--text);border:1px solid var(--accent-dark);padding:10px 18px;border-radius:999px;cursor:pointer;font-weight:700}
+    .control-btn.active{background:var(--accent);color:var(--primary)}
+    .deposit-section{background:rgba(19,27,46,0.56);border-radius:12px;padding:20px;margin:28px 0;border:1px solid rgba(0,216,255,0.04)}
+    .section-title{font-size:1.25rem;margin-bottom:12px;color:var(--accent);display:flex;align-items:center}
+    label{display:block;margin-bottom:6px;color:var(--text-dim);font-weight:600}
+    input,select{width:100%;padding:12px;border-radius:8px;background:rgba(0,0,0,0.24);border:1px solid rgba(0,216,255,0.04);color:var(--text)}
+    .submit-btn{background:linear-gradient(90deg,var(--accent),var(--success));color:var(--primary);border:none;padding:12px 16px;border-radius:8px;font-weight:800;cursor:pointer;margin-top:10px}
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:28px}
+    .info-card{background:rgba(19,27,46,0.56);padding:16px;border-radius:12px;border:1px solid rgba(0,216,255,0.03)}
+    footer{text-align:center;padding:22px 0;margin-top:40px;color:var(--text-dim);border-top:1px solid rgba(0,216,255,0.04)}
+    @media (max-width:768px){h1{font-size:2rem}.visualization-container{height:300px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoundsofRangi</div>
+      <div class="btc-price" aria-live="polite" aria-atomic="true">
+        <span class="price-label">BTC:</span>
+        <span class="price-value" id="btcPrice">--</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-label="Demo">
+        <h1>Market Mayhem Orchestration</h1>
+        <p class="subtitle">Real-time harmonic sonification and cymatic visualization — accessibility-first (phonics, color mapping, and haptic feedback).</p>
+
+        <div class="visualization-container" role="img" aria-label="Cymatic visualization">
+          <canvas id="cymatics-canvas"></canvas>
+        </div>
+
+        <div class="controls" role="toolbar" aria-label="Frequency controls">
+          <button class="control-btn active" data-freq="432">432 Hz</button>
+          <button class="control-btn" data-freq="528">528 Hz</button>
+          <button class="control-btn" data-freq="639">639 Hz</button>
+          <button class="control-btn" data-freq="852">852 Hz</button>
+          <button class="control-btn" data-freq="963">963 Hz</button>
+        </div>
+      </section>
+
+      <section class="deposit-section" aria-labelledby="depositTitle">
+        <h2 id="depositTitle" class="section-title">Web3 wallet integration (demo)</h2>
+        <form id="depositForm" novalidate>
+          <div class="form-group">
+            <label for="walletAddress">Wallet Address</label>
+            <input type="text" id="walletAddress" placeholder="Demo wallet address (no real tx)" />
+          </div>
+
+          <div class="form-group">
+            <label for="depositAmount">Deposit Amount</label>
+            <input type="number" id="depositAmount" step="0.001" min="0.001" placeholder="0.000" />
+          </div>
+
+          <div class="form-group">
+            <label for="investmentStrategy">Investment Strategy</label>
+            <select id="investmentStrategy">
+              <option value="">Select strategy</option>
+              <option value="quantum">Quantum Harmonic Scaling</option>
+              <option value="neural">Neural Frequency Analysis</option>
+              <option value="resonance">Resonance Trading</option>
+            </select>
+          </div>
+
+          <button type="submit" class="submit-btn">Initiate Quantum Transfer (demo)</button>
+          <p style="margin-top:8px;color:var(--text-dim);font-size:0.9rem">Note: This is a front-end demo only. For real wallets use a server + wallet adapters (never put private keys in client).</p>
+        </form>
+      </section>
+
+      <div class="info-grid">
+        <div class="info-card"><h3>Quantum Cymatics</h3><p>Market data converted to harmonic frequencies to reveal structural patterns invisible to traditional charts.</p></div>
+        <div class="info-card"><h3>Harmonic Trading</h3><p>432Hz baseline with dual-band signatures assists fast identification of buy/sell resonance zones.</p></div>
+        <div class="info-card"><h3>Secure by Design</h3><p>Never embed secrets client-side. Use a proxy server for private APIs and keep keys in a vault. See security checklist below.</p></div>
+      </div>
+    </main>
+
+    <footer>SoundsofRangi © 2025 | Reality Protocol LLC</footer>
+  </div>
+
+  <script>
+  /* ===========
+     CONFIG / NOTES
+     ===========
+
+     - This demo uses CoinGecko (public) for BTC price (no client API key required).
+     - For private providers or higher frequency, create a server-side proxy (see notes below).
+     - Do NOT put private API keys in client JS.
+  */
+
+  // ---------- Price fetcher (CoinGecko) ----------
+  const btcPriceEl = document.getElementById('btcPrice');
+  let lastPrice = null;
+  const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true';
+
+  async function fetchBtcPrice() {
+    try {
+      const res = await fetch(COINGECKO_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('price fetch failed ' + res.status);
+      const json = await res.json();
+      const val = json.bitcoin?.usd ?? null;
+      const change = json.bitcoin?.usd_24h_change ?? 0;
+      if (val != null) {
+        const formatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(val);
+        btcPriceEl.textContent = formatted + (change ? ` (${change.toFixed(2)}% 24h)` : '');
+        // react to price change
+        handlePriceChange(val);
+      }
+    } catch (err) {
+      console.warn('fetchBtcPrice error', err);
+    }
+  }
+
+  // Poll every 15 seconds (safe for demo); for production use websockets or server push.
+  fetchBtcPrice();
+  setInterval(fetchBtcPrice, 15000);
+
+  // ---------- Simple reaction to price changes ----------
+  function handlePriceChange(newPrice) {
+    if (lastPrice == null) { lastPrice = newPrice; return; }
+    const diff = newPrice - lastPrice;
+    const pct = (diff / lastPrice) * 100;
+    lastPrice = newPrice;
+
+    // on meaningful moves, vibrate (mobile) and play small tone (optional)
+    const thresholdPct = 0.35; // tune
+    if (Math.abs(pct) >= thresholdPct) {
+      // vibrate if available
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 30, 50]);
+      }
+      // play a short tone mapped to direction
+      playTone(432 * (1 + Math.sign(diff) * Math.min(0.08, Math.abs(pct) / 10)), 0.12);
+    }
+  }
+
+  // ---------- simple Audio helper (brief tones) ----------
+  let audioCtx = null;
+  function ensureAudio() {
+    if (audioCtx) return audioCtx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    audioCtx = new AC();
+    return audioCtx;
+  }
+  function playTone(freq = 432, duration = 0.1) {
+    const ac = ensureAudio();
+    if (!ac) return;
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = 'sine';
+    o.frequency.value = freq;
+    g.gain.value = 0.06;
+    o.connect(g); g.connect(ac.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + duration);
+    o.stop(ac.currentTime + duration + 0.02);
+  }
+
+  // ---------- Cymatics canvas + particle system ----------
+  const canvas = document.getElementById('cymatics-canvas');
+  const ctx = canvas.getContext('2d', { alpha: true });
+  let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+  function resizeCanvas() {
+    DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.floor(rect.width * DPR);
+    canvas.height = Math.floor(rect.height * DPR);
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', resizeCanvas, { passive: true });
+  resizeCanvas();
+
+  // particles
+  const maxParticles = 900; // tune for perf
+  let particles = [];
+
+  function initParticles() {
+    particles = [];
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    for (let i = 0; i < maxParticles; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
+        size: 0.8 + Math.random() * 2.2,
+        hue: 190 + Math.random() * 120,
+        angle: Math.random() * Math.PI * 2,
+        speed: 0.3 + Math.random() * 1.5
+      });
+    }
+  }
+  initParticles();
+
+  // harmonic freq state
+  let frequency = 432;
+  document.querySelectorAll('.control-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      frequency = Number(btn.dataset.freq) || 432;
+    });
+  });
+
+  // draw loop
+  let lastTime = 0;
+  function draw(time) {
+    if (!lastTime) lastTime = time;
+    const dt = (time - lastTime) / 1000;
+    lastTime = time;
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    // translucent fade background for trails
+    ctx.fillStyle = 'rgba(8,12,18,0.12)';
+    ctx.fillRect(0, 0, w, h);
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const t = time * 0.001;
+
+    // use frequency to affect wave speed & radius
+    const speedFactor = frequency / 432;
+    const k = 0.015 * speedFactor; // wave density
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      // distance & wave
+      const dx = p.x - cx;
+      const dy = p.y - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy) + 0.0001;
+      // wave formula: sin(k*dist - omega*t)
+      const omega = 2.0 * Math.PI * (frequency / 432) * 0.25;
+      const wave = Math.sin(dist * k - t * omega);
+
+      // acceleration outward/inward based on wave
+      const accel = wave * 0.4 * (1 + Math.sin(p.angle + t * 0.1));
+      p.vx += (dx / dist) * accel * 0.15 * p.speed * dt * 60;
+      p.vy += (dy / dist) * accel * 0.15 * p.speed * dt * 60;
+
+      // damping and movement
+      p.vx *= 0.96;
+      p.vy *= 0.96;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // gentle orbit rotation
+      p.angle += 0.003 * p.speed;
+
+      // wrap edges
+      if (p.x < -10) p.x = w + 10;
+      if (p.x > w + 10) p.x = -10;
+      if (p.y < -10) p.y = h + 10;
+      if (p.y > h + 10) p.y = -10;
+
+      // draw particle with glow
+      ctx.beginPath();
+      const alpha = 0.45 + Math.max(0, Math.min(0.55, (1 - dist / Math.max(w, h)) ));
+      ctx.fillStyle = `hsla(${p.hue}, 85%, ${40 + (wave * 10)}%, ${alpha})`;
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  requestAnimationFrame(draw);
+
+  // ---------- Demo form handling (no real transfers!) ----------
+  document.getElementById('depositForm').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const wallet = document.getElementById('walletAddress').value.trim();
+    const amount = Number(document.getElementById('depositAmount').value);
+    const strat = document.getElementById('investmentStrategy').value;
+    if (!wallet || !amount || !strat) {
+      alert('Please fill in all fields (this is a demo form).');
+      return;
+    }
+    const btn = ev.target.querySelector('.submit-btn');
+    btn.textContent = 'Quantum Entangling...';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = 'Transfer Complete!';
+      setTimeout(() => { btn.textContent = 'Initiate Quantum Transfer (demo)'; btn.disabled = false; ev.target.reset(); }, 1600);
+    }, 2000);
+  });
+
+  // ---------- Re-init on visibility change (saves CPU on background tabs) ----------
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // pause any heavy loops if needed (we keep RequestAnimationFrame but it throttles)
+    } else {
+      resizeCanvas(); // ensure correct size when returning
+    }
+  });
+
+  </script>
+</body>
+</html>
