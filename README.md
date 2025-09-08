@@ -4,12 +4,13 @@
              SoundsofRangi - Harmonic Financial Sonification Platform
                    PROPRIETARY TECHNOLOGY - ALL RIGHTS RESERVED
 
-**Copyright © 2025 SoundsofRangi Reality Protocol LLC. All Rights Reserved.**
+**Copyright © 2025 SoundsOfRangi Reality Protocol LLC. All Rights Reserved.**
 
 This technology is protected under:
 - Trade Secret Protection
 - Pending Patent Applications
 - Proprietary Algorithm Protection
+- Market_Mayhem_Orchestration
 
 ### 🔒 SECURITY NOTICE
 This repository contains proprietary technology belonging exclusively to Reality Protocol LLC. Unauthorized access, use, duplication, or distribution is strictly prohibited and will be prosecuted to the fullest extent of the law.
@@ -28,8 +29,8 @@ This technology is available only through:
 
 ### 📞 Commercial Inquiries
 Contact: licensing@RealityProtocol.io
-Website: www.soundsofrangi.com (Coming Soon)
-# SoundsofRangi - Harmonic Financial Sonification Platform
+Website: www.realityprotocol.io/rangi (Coming Soon)
+# Sounds Of Rangi - Harmonic Financial Sonification Platform
 
 
 ![License](https://img.shields.io/badge/License-Custom-blue.svg)
