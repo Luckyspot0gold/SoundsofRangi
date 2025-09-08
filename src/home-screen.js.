@@ -1,0 +1,29 @@
+import React from "react";
+import { View, Text, Button } from "react-native";
+import { useMetaAccount } from "@burnt-labs/abstraxion-react-native";
+
+export default function HomeScreen() {
+  const { connect, account, signAndSubmitTx } = useMetaAccount();
+
+  async function mintRealityCapsule() {
+    if (!account) return;
+    const tx = {
+      to: "0xYourContractAddressHere",
+      data: "0x1234", // placeholder payload
+    };
+    await signAndSubmitTx(tx);
+  }
+
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      {!account ? (
+        <Button title="Login / Connect" onPress={() => connect()} />
+      ) : (
+        <>
+          <Text>Connected: {account.address}</Text>
+          <Button title="Mint Reality Capsule" onPress={mintRealityCapsule} />
+        </>
+      )}
+    </View>
+  );
+}
