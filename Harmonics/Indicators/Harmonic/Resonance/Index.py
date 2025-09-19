@@ -1,4 +1,4 @@
-``python
+``python "H.R.I.
 import hashlib
 import numpy as np
 from scipy.io import wavfile
