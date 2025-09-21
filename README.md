@@ -84,3 +84,14 @@ git add README.md CONTRIBUTING.md
 git commit -m "📚 Update documentation for enhanced features
 
 Your app template should now be running on [localhost:3000](http://localhost:3000).
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true
+  }
+}
+
+module.exports = nextConfig
+
