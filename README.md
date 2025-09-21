@@ -1,3 +1,4 @@
+![Xion](https://img.shields.io/badge/Xion-Integrated-blue)](https://xion.burnt.com).
 # Rangi's Heartbeat ❤️
 ### Multi-Sensory Market Sonification - XION PoC Hackathon Submission
 
