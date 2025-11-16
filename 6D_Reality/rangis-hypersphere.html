@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/gh/enkimute/ganja.js@1.0.17/ganja.js"></script>
+  <style>
+    body { margin:0; background:#000; }
+    algebra { width:100vw; height:100vh; }
+  </style>
+</head>
+<body>
+<script>
+// 4D Conformal Geometric Algebra (great for hyperspheres + translations)
+Algebra(4,1,()=>{
+
+  // Basis vectors
+  var ni = 1e4;          // null infinity (origin)
+  var no = 0.5e-4;       // null origin
+  var up = (x)=>no+x.ni; // lift point to null cone
+
+  // Unit hypersphere in 4D (S^3 embedded in 5D CGA)
+  var sphere = ()=>ni-no;
+
+  // A rotor that represents Hamiltonian flow (market momentum)
+  var rotor = ()=>Math.exp(0.3*e12 + 0.2*e13 + 0.1*e23 + 0.15*e14);
+
+  // Starting market state (normalized on the hypersphere
+  var state = ()=>up(1.5*e1 + 0.8*e2 + 0.3*e3 + 0.1*e4).Normalized;
+
+  // Animate the orbit
+  var t=0;
+  function animate() {
+    t += 0.01;
+    var R = rotor();                     // time-varying rotor
+    var point = R * state() * ~R;         // rotate the state
+    var projected = point;               // in CGA we can directly render
+
+    // Render everything
+    document.body.innerHTML = `
+      <algebra>
+        ${[0x000000, sphere()],               // dark hypersphere
+         [0x00ff88, point],                   // glowing market point
+         [0xff0088, () => R * state() * ~R], // animated orbit trace
+         [0x4488ff, "Rotor(R)]}              // show the rotor itself
+      </algebra>
+      <div style="position:absolute;top:10px;left:10px;color:white;font-family:sans-serif;">
+        Rangi’s Heartbeat — Hamiltonian Flow on 4D Hypersphere<br>
+        Drag to rotate • Scroll to zoom • Market momentum = rotor strength
+      </div>`;
+    requestAnimationFrame(animate);
+  }
+  animate();
+});
+</script>
+</body>
+</html>
