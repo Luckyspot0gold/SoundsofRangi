@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rangi’s Heartbeat — 5D Hamiltonian Hypersphere (Live)</title>
+  <script src="https://ganja.js.org/ganja.js"></script>
+  <style>
+    html,body { height:100%; margin:0; background:#000; color:#0f0; font-family:monospace; }
+    #overlay { position: absolute; left:12px; top:12px; z-index:20; background: rgba(0,0,0,0.6); padding:10px; border-radius:6px; }
+    #canvas { width:100vw; height:100vh; display:block; }
+    button { margin-top:6px; }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <div>Rangi’s Heartbeat — 5D Hamiltonian Flow on Hypersphere</div>
+    <div style="font-size:12px; margin-top:6px;">Drag = rotate • Scroll = zoom • Market momentum drives rotor strength</div>
+    <div style="margin-top:8px;">
+      <button id="soundOn">Enable Sound</button>
+      <button id="vibeTest">Test Haptic</button>
+    </div>
+    <div id="metrics" style="margin-top:8px; font-size:12px;"></div>
+  </div>
+
+  <!-- Ganaj algebra renderer live -->
+  <div id="canvas"></div>
+
+<script>
+/*
+  Demo outline:
+  - Uses ganja.js for geometric algebra visualization (keeps your hypersphere idea)
+  - Simulated market data for momentum & vol (replace with real feed below)
+  - WebAudio oscillator that maps momentum -> pitch and vol -> amplitude
+  - Vibration API used for confirmation/haptic patterns
+  - Clear hooks: replace getMarketTick() with real websocket / Pyth / Switchboard feed
+*/
+
+let audioCtx = null;
+let osc = null;
+let gain = null;
+let soundEnabled = false;
+
+document.getElementById('soundOn').onclick = async () => {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    osc = audioCtx.createOscillator();
+    gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    soundEnabled = true;
+    document.getElementById('soundOn').textContent = 'Sound: ON';
+  } else {
+    // toggle
+    soundEnabled = !soundEnabled;
+    document.getElementById('soundOn').textContent = soundEnabled ? 'Sound: ON' : 'Sound: OFF';
+  }
+};
+
+document.getElementById('vibeTest').onclick = () => {
+  if (navigator.vibrate) navigator.vibrate([60,40,60]);
+  else alert('Vibration API not supported on this device.');
+};
+
+// --- Market feed stub: replace this with real feed --------------------------------
+function getMarketTick() {
+  // For production: subscribe to a websocket Pyth / Switchboard feed and return {momentum, vol}
+  const now = performance.now();
+  const momentum = Math.sin(now/1800)*0.6 + 0.3; // -? to +?
+  const vol      = Math.abs(Math.cos(now/2600))*0.7;
+  return { momentum, vol };
+}
+// -----------------------------------------------------------------------------------
+
+// Render with ganja.js
+const canvas = document.getElementById('canvas');
+canvas.innerHTML = `<algebra style="width:100%; height:100%"></algebra>`; // container for ganja
+Algebra(5,1, function() {
+  // e1..e5, e12, e34 etc. available inside here
+  // Build an evolving rotor and show multivectors as geometry textually (visual renderer can be swapped)
+  const view = this; // ganja context
+
+  // Nice initial vector on hypersphere (normalize before use)
+  const baseVec = 1.2*e1 + 0.9*e2 + 0.6*e3 + 0.4*e4 + 0.2*e5;
+  let state = baseVec / baseVec.Length;
+
+  let trail = [];
+
+  function step() {
+    const tick = getMarketTick();
+    // rotor generator: combine basis bivectors with market params
+    // Keep coefficients small to avoid numerical explosion
+    const R = Math.exp( 0.6 * tick.momentum * (e12 + e34 + e15) + 0.3 * tick.vol * (e23 + e45 + e13) );
+    state = R * state * ~R; // conjugation motion
+
+    trail.push(state);
+    if (trail.length > 160) trail.shift();
+
+    // update minimal overlay metrics
+    document.getElementById('metrics').innerText = 
+       `Momentum: ${tick.momentum.toFixed(3)}  Vol: ${tick.vol.toFixed(3)}  Trail: ${trail.length}`;
+
+    // Sonification: map momentum -> pitch (Hz), vol -> amplitude [0..1]
+    if (soundEnabled && audioCtx) {
+      const minHz = 110, maxHz = 880;
+      const freq = Math.max(minHz, Math.min(maxHz, minHz + (tick.momentum+1)* (maxHz-minHz)/2 ));
+      const amp = Math.max(0.02, Math.min(0.7, tick.vol));
+      osc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
+      gain.gain.setTargetAtTime(amp, audioCtx.currentTime, 0.05);
+    }
+
+    // Haptic subtle pulse proportional to vol (for devices that support it)
+    if (navigator.vibrate) {
+      // only vibrate periodically to avoid hogging the motor
+      if (Math.random() < 0.06) {
+        const duration = Math.round(30 + tick.vol*120);
+        navigator.vibrate(duration);
+      }
+    }
+
+    // Render: use ganja's built-in renderer to draw multivectors. For complex visual, you would construct geometry.
+    // Here we output a simple textual algebra canvas for now.
+    // For production, build a custom 3D cymatic renderer (three.js + shader) using state coordinates.
+    this.graph([{color:0x001122, style:{stroke:0.05}}, state, ...trail]);
+  }
+
+  // animate loop
+  const raf = () => { step(); requestAnimationFrame(raf); };
+  raf();
+});
+</script>
+</body>
+</html>
