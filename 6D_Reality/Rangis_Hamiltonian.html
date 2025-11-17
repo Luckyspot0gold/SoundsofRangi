@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rangi’s Heartbeat — 5D Hamiltonian Hypersphere (Live)</title>
+  <script src="https://ganja.js.org/ganja.js"></script>
+  <style>
+    body { margin:0; background:#000; overflow:hidden; }
+    #info {
+      position:absolute; top:10px; left:10px; color:#0f0; font-family:monospace;
+      background:rgba(0,0,0,0.7); padding:10px; border-radius:8px; pointer-events:none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="info">
+  Rangi’s Heartbeat — 5D Hamiltonian Flow on Hypersphere<br>
+  Drag = rotate • Scroll = zoom • Market momentum drives rotor strength<br>
+  Green = current state • Red orbit = past trajectory • Blue = future projection
+</div>
+
+<script>
+// 5D Conformal Geometric Algebra (CGA) — perfect for true hypersphere + translations
+Algebra(5,1,()=>{
+
+  // Null basis
+  var ni = 1e4, no = 0.5e-4;
+  var up = (p)=>no+p.ni;
+
+  // 4-sphere (hypersphere S^4 in 6D CGA)
+  var hypersphere = ()=>ni-no;
+
+  // Simulated live market data (replace with real Pyth feed later)
+  var marketMomentum = 0;
+  var marketVol = 0;
+  function updateMarket() {
+    // Fake real-time data — in production: fetch Pyth/Switchboard
+    marketMomentum = Math.sin(performance.now()/2000)*0.4 + 0.2;
+    marketVol      = Math.abs(Math.cos(performance.now()/3000))*0.3;
+  }
+
+  // Hamiltonian rotor generator — your McCrea Metric lives here
+  var rotor = ()=>Math.exp(
+    marketMomentum*(e12 + e34 + e15) +
+    marketVol*(e23 + e45 + e13)
+  );
+
+  // Starting normalized market state on the hypersphere
+  var state = ()=>up(1.2*e1 + 0.9*e2 + 0.6*e3 + 0.4*e4 + 0.2*e5).Normalized;
+
+  // Trail buffers for past/future projection
+  var trail = [];
+  var future = [];
+
+  var t = 0;
+  function animate() {
+    updateMarket();
+    t += 0.012;
+
+    var R = rotor();
+    var current = R * state() * ~R;
+
+    // Record trail (last 200 points)
+    trail.push(current);
+    if (trail.length > 200) trail.shift();
+
+    // Project future 50 steps
+    future = [];
+    var temp = current;
+    for (let i=0;i<50;i++) {
+      temp = R * temp * ~R;
+      future.push(temp);
+    }
+
+    // Render the whole scene
+    document.body.innerHTML = `
+      <algebra animate="1">
+        ${[0x111111, hypersphere()],                     // dark hypersphere
+         [0x00ff88, current],                           // current market state (green)
+         [0xff4488, ...trail],                         // past orbit (red)
+         [0x4488ff, ...future],                         // predicted orbit (blue)
+         [0x00ffff, "McCrea Hamiltonian Rotor"],        // label
+         [0xffffff, "Momentum: "+marketMomentum.toFixed(3)+" | Vol: "+marketVol.toFixed(3)]}
+      </algebra>`;
+    requestAnimationFrame(animate);
+  }
+  animate();
+});
+</script>
+</body>
+</html>
