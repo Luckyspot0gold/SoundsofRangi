@@ -42,7 +42,7 @@ class X402SensoryBridge {
     const dataString = `${payment.from}-${payment.to}-${payment.amount}-${Date.now()}`;
     const signature = this.hashToSensoryPattern(dataString);
     
-    return {
+     {
       haptic: this.hapticPatterns.get(signature.hapticPattern),
       audio: this.paymentFrequencies[this.getAmountTier(payment.amount)],
       visual: this.amountToColorGradient(payment.amount),
