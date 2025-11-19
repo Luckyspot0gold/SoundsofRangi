@@ -1,0 +1,87 @@
+the 111.11 Hz tone screams.
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rangi’s Heartbeat — Live Phase Transition Detector</title>
+  <script src="https://ganja.js.org/ganja.js"></script>
+  <style>
+    body { margin:0; background:#000; overflow:hidden; }
+    #hud {
+      position:fixed; top:20px; left:20px; padding:20px; background:rgba(0,0,0,0.8);
+      border:3px solid #f0f; border-radius:15px; color:#f0f; font-family:'Courier New';
+      text-shadow:0 0 15px #f0f; max-width:500px; pointer-events:none; z-index:10;
+    }
+    #phase { font-size:2em; }
+  </style>
+</head>
+<body>
+
+<div id="hud">
+  <h1>Rangi’s Heartbeat — Phase Transition Detector</h1>
+  Real Pyth BTC/USD feed<br>
+  When criticality threshold crossed → <span id="phase">SUBCRITICAL</span><br>
+  The moment the market flips
+</div>
+
+<script>
+// 8D GA — phase transition engine
+Algebra(8,2,()=>{
+
+  var ni = 1e4, no = 0.5e-4;
+  var up = (p)=>no + p.ni;
+  var hypersphere = ()=>ni-no;
+
+  const PYTH_BTC_ID = "e62df6c8-b0c5-5c5d-a9e4-4c3f8d5a7f6a";
+  var lastPrice = 0;
+  var criticality = 0;
+
+  async function getPyth() {
+    try {
+      const r = await fetch(`https://hermes.pyth.network/api/latest_price_feeds?ids%5B%5D=${PYTH_BTC_ID}`);
+      const d = await r.json();
+      const p = d[0].price.price * Math.pow(10, d[0].price.expo);
+      return p;
+    } catch { return lastPrice || 60000; }
+  }
+
+  var t = 0;
+  function animate() {
+    t += 0.01;
+    if (Math.floor(t*100)%150===0) {
+      getPyth().then(price => {
+        const delta = price - lastPrice;
+        lastPrice = price;
+        criticality = Math.min(1, criticality + Math.abs(delta)/1000); // criticality climbs with momentum
+        if (Math.abs(delta)<10) criticality *= 0.99; // decay when quiet
+      });
+    }
+
+    // Phase state
+    const isCritical = criticality > 0.7;
+    const isSupercritical = criticality > 0.95;
+
+    document.getElementById('phase').innerText = isSupercritical ? "SUPERCRITICAL — AVALANCHE" :
+                                                   isCritical ? "CRITICAL — EDGE" : "SUBCRITICAL";
+
+    document.getElementById('phase').style.color = isSupercritical ? "#f00" :
+                                                    isCritical ? "#ff0" : "#0f0";
+
+    // Visual flip at criticality
+    const color = isSupercritical ? 0xff0000 : isCritical ? 0xffff00 : 0x00ff00;
+
+    document.body.innerHTML = `
+      <algebra animate="1" scale="2">
+        ${[0x001133, hypersphere()],
+         [color, up(Math.sin(t)*e1 + Math.cos(t)*e2 + criticality*e3)],
+         [0x00ffff, "Criticality: "+criticality.toFixed(3)]}
+      </algebra>`;
+    requestAnimationFrame(animate);
+  }
+  animate();
+});
+</script>
+</body>
+</html>
